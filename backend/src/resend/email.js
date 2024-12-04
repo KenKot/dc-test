@@ -39,4 +39,39 @@ const sendWelcomeEmail = async (email, name) => {
   }
 };
 
-module.exports = { sendVerificationTokenEmail, sendWelcomeEmail };
+const sendPasswordResetEmail = async (email, resetURL) => {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      //   to: [process.env.RESEND_TEST_EMAIL],
+      to: [email],
+      subject: "Reset your password",
+      html: `Click <a href="${resetURL}">here</a> to reset your password`,
+    });
+  } catch (error) {
+    console.error("error sending password reset email: " + error);
+    throw new Error("error sending password reset email");
+  }
+};
+
+const sendResetSuccessEmail = async (email) => {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      //   to: [process.env.RESEND_TEST_EMAIL],
+      to: [email],
+      subject: "Password reset was successful",
+      html: `Your password was reset successfully`,
+    });
+  } catch (error) {
+    console.error("error sending reset success email: " + error);
+    throw new Error("error sending reset success email");
+  }
+};
+
+module.exports = {
+  sendVerificationTokenEmail,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+};
