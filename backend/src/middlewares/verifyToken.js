@@ -8,12 +8,20 @@ const verifyToken = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const decodedJWT = jwt.decode(token, process.env.JWT_SECRET);
-    if (!decodedJWT) {
-      res.status(401).json({ message: "Unauthorized" });
+    
+    // Need to handle token expiration properly
+
+    // const decodedJWT = jwt.decode(token, process.env.JWT_SECRET);
+    // if (!decodedJWT) {
+    //   res.status(401).json({ message: "Unauthorized" });
+    // }
+
+    const verifiedJWT = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verifiedJWT) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    req.id = decodedJWT.id;
+    req.id = verifiedJWT.id;
     next();
   } catch (error) {
     console.log(error);

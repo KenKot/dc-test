@@ -54,7 +54,7 @@ const signup = async (req, res) => {
     res.status(201).json({
       message: "User created successfully",
       user: {
-        firstname: user.first,
+        firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
       },
@@ -191,6 +191,8 @@ const resetPassword = async (req, res) => {
     await user.save();
 
     await sendResetSuccessEmail(user.email);
+
+    res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.log("error resetting password: " + error);
     res.status(500).json({ message: error.message });
@@ -202,17 +204,16 @@ const checkAuth = async (req, res) => {
     const user = await User.findById(req.id);
 
     if (!user) {
-      res.status(400).json({ message: "user not found" });
+      return res.status(400).json({ message: "user not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        isVerified: user.isVerified,
-      });
+    res.status(200).json({
+      _id: user._id, // remove?
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      isVerified: user.isVerified,
+    });
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: "unauthorized" });
