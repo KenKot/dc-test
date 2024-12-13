@@ -7,10 +7,11 @@ import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { Button } from "./components/ui/button";
 import DashboardPage from "./pages/DashboardPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  // console.log("ProtectRoute: ", isAuthenticated, user);
   if (!isAuthenticated && !user) {
     return <Navigate to="/login" replace />;
   }
@@ -33,14 +34,11 @@ function App() {
 
   useEffect(() => {
     checkAuth();
-    // console.log("From App.jsx: ");
-    // console.log("user: ", user);
-    // console.log("isAuthenticated: ", isAuthenticated);
   }, [checkAuth]);
 
-  // if (isCheckingAuth) {
-  //   return <div>Loading...</div>;
-  // }
+  if (isCheckingAuth) {
+    return <div>Loading...</div>;
+  }
 
   const handleLogout = async () => {
     await logout();
@@ -50,10 +48,33 @@ function App() {
     <div>
       {user && <Button onClick={handleLogout}>Logout</Button>}
       <Routes>
-        <Route path="/" element={"HOME"} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={"Home"} />
+        <Route
+          path="/signup"
+          element={
+            <AuthenticatedUserRoute>
+              <SignUpPage />
+            </AuthenticatedUserRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <AuthenticatedUserRoute>
+              <LoginPage />
+            </AuthenticatedUserRoute>
+          }
+        />
         <Route path="/verify-email" element={<VerificationEmailPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthenticatedUserRoute>
+              <ForgotPasswordPage />
+            </AuthenticatedUserRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={

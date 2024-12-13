@@ -120,13 +120,13 @@ export const useAuthStore = create((set, get) => ({
 
     // Accessing state values properly
     const currentState = get();
-    console.log("user: ", currentState.user || "no user");
-    console.log("isAuthenticated: ", currentState.isAuthenticated);
-    console.log("isCheckingAuth: ", currentState.isCheckingAuth);
+    // console.log("user: ", currentState.user || "no user");
+    // console.log("isAuthenticated: ", currentState.isAuthenticated);
+    // console.log("isCheckingAuth: ", currentState.isCheckingAuth);
 
-    console.log("----------------");
     set({ isCheckingAuth: true, error: null });
 
+    // BACKEND
     // res.status(200).json({
     //   _id: user._id, // remove?
     //   firstname: user.firstname,
@@ -158,6 +158,48 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       set({ isCheckingAuth: false, isAuthenticated: false, user: null });
       console.log(error);
+    }
+  },
+
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(
+        BASE_URL + "/api/auth/forgot-password",
+        {
+          email,
+        },
+        { withCredentials: true }
+      );
+
+      console.log(response.data.message);
+      set({ isLoading: false, message: response.data.message });
+    } catch (error) {
+      set({ isLoading: false, error: error.response.data.message });
+      console.log(error);
+    }
+  },
+  resetPassword: async (token, password) => {
+    console.log("A.S. resetPassword() fired");
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/auth/reset-password/${token}`,
+        {
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      console.log("@@@1", response.data.message);
+
+      set({ isLoading: false, message: response.data.message });
+    } catch (error) {
+      console.log("@@@2", error.response.data.message);
+
+      set({ isLoading: false, error: error.response?.data?.message });
+      console.log(error);
+      throw error;
     }
   },
 }));
