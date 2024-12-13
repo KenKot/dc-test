@@ -9,10 +9,11 @@ const {
 } = require("../resend/email");
 
 const signup = async (req, res) => {
+  console.log("signup fired");
   const { firstname, lastname, email, password } = req.body;
 
   try {
-    if (!firstname || !lastname || !email || !password) {
+    if (!firstname || !email || !password) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields" });
@@ -29,14 +30,14 @@ const signup = async (req, res) => {
 
     const user = await User.create({
       firstname,
-      lastname,
+      // lastname,
       email,
       password: hashedPassword,
       verificationToken,
-      verificationExpiresAt: Date.now() + 24 * 60 * 60 * 1000, //24 hours
+      // verificationExpiresAt: Date.now() + 24 * 60 * 60 * 1000, //24 hours
     });
 
-    await user.save();
+    // await user.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "14d",
@@ -46,7 +47,7 @@ const signup = async (req, res) => {
       httpOnly: true, // cookie cannot be accessed by client
       secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
       sameSite: "strict", // cookie is not sent if the website is on a different domain
-      maxAage: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     await sendVerificationTokenEmail(user.email, verificationToken); // resend/email.js
@@ -55,11 +56,12 @@ const signup = async (req, res) => {
       message: "User created successfully",
       user: {
         firstname: user.firstname,
-        lastname: user.lastname,
+        // lastname: user.lastname,
         email: user.email,
       },
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -70,7 +72,7 @@ const verifyEmail = async (req, res) => {
   try {
     const user = await User.findOne({
       verificationToken,
-      verificationExpiresAt: { $gt: Date.now() },
+      // verificationExpiresAt: { $gt: Date.now() },
     });
 
     if (!user) {
@@ -126,7 +128,18 @@ const login = async (req, res) => {
       maxAage: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    res.status(200).json({ message: "Login successful" });
+    // res.status(200).json({ message: "Login successful" });
+
+    res.status(200).json({
+      user: {
+        _id: user._id, // remove?
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+      message: "Login successful",
+    });
   } catch (error) {
     console.log("error logging in: " + error);
     res.status(500).json({ message: error.message });
@@ -208,11 +221,14 @@ const checkAuth = async (req, res) => {
     }
 
     res.status(200).json({
-      _id: user._id, // remove?
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      isVerified: user.isVerified,
+      user: {
+        _id: user._id, // remove?
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+      message: "checked Auth successfully",
     });
   } catch (error) {
     console.log(error);

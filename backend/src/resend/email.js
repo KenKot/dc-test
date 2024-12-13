@@ -6,7 +6,6 @@ const {
 require("dotenv").config();
 
 const sendVerificationTokenEmail = async (email, verificationToken) => {
-  console.log(verificationTokenEmailTemplate);
   try {
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",
