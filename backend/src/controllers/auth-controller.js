@@ -26,7 +26,7 @@ const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = Math.random().toString(36).substring(7);
+    const verificationToken = "ABCDF"; //To Update
 
     const user = await User.create({
       firstname,
@@ -39,30 +39,32 @@ const signup = async (req, res) => {
 
     // await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "14d",
-    });
+    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "14d",
+    // });
 
-    res.cookie("token", token, {
-      httpOnly: true, // cookie cannot be accessed by client
-      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
-      sameSite: "strict", // cookie is not sent if the website is on a different domain
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true, // cookie cannot be accessed by client
+    //   secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
+    //   sameSite: "strict", // cookie is not sent if the website is on a different domain
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    // });
 
     await sendVerificationTokenEmail(user.email, verificationToken); // resend/email.js
 
     res.status(201).json({
+      success: true,
       message: "User created successfully",
-      user: {
-        firstname: user.firstname,
-        // lastname: user.lastname,
-        email: user.email,
-      },
+      //remove returning user
+      // user: {
+      //   firstname: user.firstname,
+      //   // lastname: user.lastname,
+      //   email: user.email,
+      // },
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -86,12 +88,25 @@ const verifyEmail = async (req, res) => {
     user.verificationExpiresAt = undefined;
     await user.save();
 
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "14d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true, // cookie cannot be accessed by client
+      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
+      sameSite: "strict", // cookie is not sent if the website is on a different domain
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     await sendWelcomeEmail(user.email, user.firstname); // resend/email.js
 
-    res.status(200).json({ message: "Email verified successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully" });
   } catch (error) {
     console.log("error verifying email: " + error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -125,12 +140,13 @@ const login = async (req, res) => {
       httpOnly: true, // cookie cannot be accessed by client
       secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
       sameSite: "strict", // cookie is not sent if the website is on a different domain
-      maxAage: 7 * 24 * 60 * 60 * 1000, // 7 days
+      Age: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     // res.status(200).json({ message: "Login successful" });
 
     res.status(200).json({
+      success: true,
       user: {
         _id: user._id, // remove?
         firstname: user.firstname,
@@ -142,13 +158,25 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.log("error logging in: " + error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 const logout = async (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({ message: "Logout successful" });
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Error during logout:", error.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Logout failed. Please try again." });
+  }
 };
 
 const forgotPassword = async (req, res) => {
@@ -174,10 +202,12 @@ const forgotPassword = async (req, res) => {
       `${process.env.CLIENT_URL}/reset-password/${resetPasswordToken}`
     ); // resend/email.js
 
-    res.status(200).json({ message: "Password reset email sent" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset email sent" });
   } catch (error) {
     console.log("error sending password reset email: " + error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -205,10 +235,12 @@ const resetPassword = async (req, res) => {
 
     await sendResetSuccessEmail(user.email);
 
-    res.status(200).json({ message: "Password reset successful" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
   } catch (error) {
     console.log("error resetting password: " + error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -221,6 +253,7 @@ const checkAuth = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       user: {
         _id: user._id, // remove?
         firstname: user.firstname,
@@ -232,7 +265,7 @@ const checkAuth = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: "unauthorized" });
+    res.status(400).json({ success: false, message: "unauthorized" });
   }
 };
 

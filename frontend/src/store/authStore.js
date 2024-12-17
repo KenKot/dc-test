@@ -30,8 +30,8 @@ export const useAuthStore = create((set, get) => ({
       console.log(response?.data);
       set({
         isLoading: false,
-        isAuthenticated: true,
-        user: response.data.user,
+        // isAuthenticated: true,
+        // user: response.data.user, // this will cause 'checkAuth()' to set isAuthenticated to true
       });
     } catch (error) {
       set({ isLoading: false, error: error.response?.data?.message });
@@ -156,6 +156,7 @@ export const useAuthStore = create((set, get) => ({
         });
       }
     } catch (error) {
+      console.log("i'm from checkAuth's catch");
       set({ isCheckingAuth: false, isAuthenticated: false, user: null });
       console.log(error);
     }

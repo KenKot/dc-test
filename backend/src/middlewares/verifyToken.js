@@ -5,27 +5,31 @@ const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No token provided" });
     }
 
-    
-    // Need to handle token expiration properly
+    // Verify the token and handle errors
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        if (err.name === "TokenExpiredError") {
+          console.error("Token expired:", err.message);
+          return res
+            .status(401)
+            .json({ message: "Unauthorized: Token expired" });
+        }
+        console.error("Token verification error:", err.message);
+        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+      }
 
-    // const decodedJWT = jwt.decode(token, process.env.JWT_SECRET);
-    // if (!decodedJWT) {
-    //   res.status(401).json({ message: "Unauthorized" });
-    // }
-
-    const verifiedJWT = jwt.verify(token, process.env.JWT_SECRET);
-    if (!verifiedJWT) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    req.id = verifiedJWT.id;
-    next();
+      // Token is valid; attach the user ID to the request object
+      req.id = decoded.id;
+      next();
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(401).json({ message: "Unauthorized" });
+    console.error("Error in verifyToken middleware:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

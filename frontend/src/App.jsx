@@ -12,7 +12,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  if (!isAuthenticated && !user) {
+  console.log(isAuthenticated, user, "<-- ProtectRoute");
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
