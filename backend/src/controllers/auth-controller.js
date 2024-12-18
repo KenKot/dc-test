@@ -8,6 +8,8 @@ const {
   sendResetSuccessEmail,
 } = require("../resend/email");
 
+const generateVerificationToken = require("../utils/generateVerificationToken.js");
+
 const signup = async (req, res) => {
   console.log("signup fired");
   const { firstname, lastname, email, password } = req.body;
@@ -26,7 +28,7 @@ const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = "ABCDF"; //To Update
+    const verificationToken = generateVerificationToken();
 
     const user = await User.create({
       firstname,
@@ -103,7 +105,11 @@ const verifyEmail = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Email verified successfully" });
+      .json({
+        success: true,
+        message: "Email verified successfully",
+        user: { firstname: user.firstname },
+      });
   } catch (error) {
     console.log("error verifying email: " + error);
     res.status(500).json({ success: false, message: error.message });
@@ -140,7 +146,7 @@ const login = async (req, res) => {
       httpOnly: true, // cookie cannot be accessed by client
       secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
       sameSite: "strict", // cookie is not sent if the website is on a different domain
-      Age: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     // res.status(200).json({ message: "Login successful" });

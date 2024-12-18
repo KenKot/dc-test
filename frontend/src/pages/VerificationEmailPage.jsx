@@ -31,7 +31,7 @@ export default function VerificationEmailPage() {
   return (
     <div className="space-y-2 flex flex-col w-full mx-auto justify-center">
       <InputOTP
-        maxLength={5}
+        maxLength={6}
         value={value}
         onChange={(value) => setValue(value)}
       >
@@ -41,6 +41,7 @@ export default function VerificationEmailPage() {
           <InputOTPSlot index={2} />
           <InputOTPSlot index={3} />
           <InputOTPSlot index={4} />
+          <InputOTPSlot index={5} />
         </InputOTPGroup>
       </InputOTP>
       <div className="text-center text-sm">

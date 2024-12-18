@@ -9,6 +9,7 @@ const AuthLayout = () => {
     useAuthStore();
 
   useEffect(() => {
+    console.log("AuthLayout.jsx useEffect() fired");
     checkAuth();
   }, [checkAuth]);
 

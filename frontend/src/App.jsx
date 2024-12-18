@@ -14,6 +14,7 @@ import PublicPage1 from "./pages/PublicPage1";
 import PublicPage2 from "./pages/PublicPage2";
 import AuthLayout from "./layouts/AuthLayout";
 import WelcomePage from "./pages/WelcomePage";
+import ProfilePage from "./pages/ProfilePage";
 
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -77,6 +78,14 @@ const App = () => {
           element={
             <ProtectRoute>
               <DashboardPage />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectRoute>
+              <ProfilePage />
             </ProtectRoute>
           }
         />

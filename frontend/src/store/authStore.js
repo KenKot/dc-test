@@ -55,7 +55,11 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
-      console.log(response?.data);
+      console.log("response?.data from verifyEmail()", response?.data);
+      console.log(
+        "response?.data.user from verifyEmail()",
+        response?.data.user
+      );
       set({
         isLoading: false,
         isAuthenticated: true,
@@ -85,9 +89,6 @@ export const useAuthStore = create((set, get) => ({
         isLoading: false,
         isAuthenticated: true,
         user: response.data.user,
-        // user: response.data.user,
-        // //my/bw's backend doesnt send back "user"
-        // I'll add it!
       });
     } catch (error) {
       set({ isLoading: false, error: error.response?.data?.message });
