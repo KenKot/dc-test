@@ -8,11 +8,14 @@ import {
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/use-toast";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function VerificationEmailPage() {
   const [value, setValue] = useState("");
   const { verifyEmail, isLoading, error } = useAuthStore();
   const { toast } = useToast();
+
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     await verifyEmail(value);
@@ -21,6 +24,7 @@ export default function VerificationEmailPage() {
         title: "Email is verified!",
         description: "Your email has been successfully verified",
       });
+      navigate("/login");
     }
   };
 

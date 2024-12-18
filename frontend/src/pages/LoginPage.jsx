@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/authStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,7 +31,9 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="bg-white p-8 rounded-lg shadow-md w-96"
       >
-        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Sign in to your account
+        </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -73,12 +75,21 @@ export default function LoginPage() {
               </div>
             </motion.div>
           </div>
+          {error && <p className="text-sm text-red-500">{error}</p>}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Loading..." : "Login"}
             </Button>
           </motion.div>
         </form>
+        <div className="mt-6 text-center">
+          <p className="text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              Create an account
+            </Link>
+          </p>
+        </div>
       </motion.div>
     </div>
   );
