@@ -11,20 +11,22 @@ const {
 const generateVerificationToken = require("../utils/generateVerificationToken.js");
 
 const signup = async (req, res) => {
-  console.log("signup fired");
   const { firstname, lastname, email, password } = req.body;
 
   try {
     if (!firstname || !lastname || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please provide all required fields" });
+      return res.status(400).json({
+        message: "Please provide all required fields",
+        success: false,
+      });
     }
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res
+        .status(400)
+        .json({ message: "User already exists", success: false });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,30 +41,11 @@ const signup = async (req, res) => {
       // verificationExpiresAt: Date.now() + 24 * 60 * 60 * 1000, //24 hours
     });
 
-    // await user.save();
-
-    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    //   expiresIn: "14d",
-    // });
-
-    // res.cookie("token", token, {
-    //   httpOnly: true, // cookie cannot be accessed by client
-    //   secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
-    //   sameSite: "strict", // cookie is not sent if the website is on a different domain
-    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    // });
-
     await sendVerificationTokenEmail(user.email, verificationToken); // resend/email.js
 
     res.status(201).json({
       success: true,
       message: "User created successfully",
-      //remove returning user
-      // user: {
-      //   firstname: user.firstname,
-      //   // lastname: user.lastname,
-      //   email: user.email,
-      // },
     });
   } catch (error) {
     console.log(error);
@@ -80,9 +63,10 @@ const verifyEmail = async (req, res) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired verification token" });
+      return res.status(400).json({
+        message: "Invalid or expired verification token",
+        success: false,
+      });
     }
 
     user.isVerified = true;
@@ -126,19 +110,25 @@ const login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials", success: false });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials", success: false });
     }
 
     const isVerified = user.isVerified;
 
     if (!isVerified) {
-      return res.status(400).json({ message: "Email not verified" });
+      return res
+        .status(400)
+        .json({ message: "Email not verified", success: false });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -151,8 +141,6 @@ const login = async (req, res) => {
       sameSite: "strict", // cookie is not sent if the website is on a different domain
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
-    // res.status(200).json({ message: "Login successful" });
 
     res.status(200).json({
       success: true,
@@ -196,7 +184,9 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res
+        .status(400)
+        .json({ message: "User not found", success: false });
     }
 
     const resetPasswordToken = Math.random().toString(36).substring(7);
@@ -232,7 +222,9 @@ const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired token", success: false });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -259,7 +251,9 @@ const checkAuth = async (req, res) => {
     const user = await User.findById(req.id);
 
     if (!user) {
-      return res.status(400).json({ message: "user not found" });
+      return res
+        .status(400)
+        .json({ message: "user not found", success: false });
     }
 
     res.status(200).json({

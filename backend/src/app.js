@@ -17,6 +17,7 @@ app.use(express.json()); // parse JSON bodies
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 app.use("/api/auth", require("./routes/auth.js"));
+app.use("/api/admin", require("./routes/admin.js"));
 
 connectDB();
 
