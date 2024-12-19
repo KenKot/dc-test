@@ -15,7 +15,7 @@ const signup = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
 
   try {
-    if (!firstname || !email || !password) {
+    if (!firstname || !lastname || !email || !password) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields" });
@@ -32,7 +32,7 @@ const signup = async (req, res) => {
 
     const user = await User.create({
       firstname,
-      // lastname,
+      lastname,
       email,
       password: hashedPassword,
       verificationToken,
@@ -101,15 +101,18 @@ const verifyEmail = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    await sendWelcomeEmail(user.email, user.firstname); // resend/email.js
+    // await sendWelcomeEmail(user.email, user.firstname); // resend/email.js
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Email verified successfully",
-        user: { firstname: user.firstname },
-      });
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.log("error verifying email: " + error);
     res.status(500).json({ success: false, message: error.message });
@@ -154,11 +157,12 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       user: {
-        _id: user._id, // remove?
+        // _id: user._id, // <----------            add back in?
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
-        isVerified: user.isVerified,
+        isVerified: user.isVerified, // can remove?
+        role: user.role,
       },
       message: "Login successful",
     });
@@ -266,6 +270,7 @@ const checkAuth = async (req, res) => {
         lastname: user.lastname,
         email: user.email,
         isVerified: user.isVerified,
+        role: user.role,
       },
       message: "checked Auth successfully",
     });

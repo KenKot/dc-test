@@ -15,7 +15,10 @@ import PublicPage2 from "./pages/PublicPage2";
 import AuthLayout from "./layouts/AuthLayout";
 import WelcomePage from "./pages/WelcomePage";
 import ProfilePage from "./pages/ProfilePage";
+import AccountApprovalPending from "./pages/AccountApprovalPending";
+import AccountDeactivatedPage from "./pages/AccountDeactivatedPage";
 
+//Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
   console.log(isAuthenticated, user, "<-- ProtectRoute");
@@ -23,9 +26,19 @@ const ProtectRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
+  //user.role == "pending" ? go to pending page
+  if (user.role === "pending") {
+    return <Navigate to="/account-pending" replace />;
+  }
+  //user.role == "banned" ? go to deactivated page
+  if (user.role === "banned") {
+    return <Navigate to="/account-deactivated" replace />;
+  }
+
   return children;
 };
 
+//logged in user shouldnt go to "signup/verifypassword/forgotpassword/login"
 const AuthenticatedUserRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
   if (isAuthenticated && user) {
@@ -43,6 +56,11 @@ const App = () => {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/page1" element={<PublicPage1 />} />
         <Route path="/page2" element={<PublicPage2 />} />
+        <Route path="/account-pending" element={<AccountApprovalPending />} />
+        <Route
+          path="/account-deactivated"
+          element={<AccountDeactivatedPage />}
+        />
       </Route>
 
       {/* Auth Routes */}

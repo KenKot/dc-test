@@ -10,8 +10,10 @@ import { useNavigate } from "react-router-dom";
 
 export default function SignUpPage() {
   const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   const { signup, isLoading, error, user } = useAuthStore();
   //   console.log(user);
@@ -19,7 +21,7 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signup(firstname, email, password);
+    await signup(firstname, lastname, email, password);
     navigate("/verify-email");
   };
 
@@ -38,7 +40,7 @@ export default function SignUpPage() {
         <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="firstname">First Name</Label>
             <motion.div whileFocus="focus" variants={inputVariants}>
               <div className="relative">
                 <User
@@ -46,11 +48,32 @@ export default function SignUpPage() {
                   size={18}
                 />
                 <Input
-                  id="name"
+                  id="firstname"
                   type="text"
-                  placeholder="Enter your name"
+                  placeholder="Enter your first name"
                   value={firstname}
                   onChange={(e) => setFirstname(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </motion.div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastname">Last Name</Label>
+            <motion.div whileFocus="focus" variants={inputVariants}>
+              <div className="relative">
+                <User
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+
+                <Input
+                  id="lastname"
+                  type="text"
+                  placeholder="Enter your last name"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -97,6 +120,26 @@ export default function SignUpPage() {
               </div>
             </motion.div>
           </div>
+          {/* <div className="space-y-2">
+            <Label htmlFor="password">Confirm Password</Label>
+            <motion.div whileFocus="focus" variants={inputVariants}>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={passwordConfirmation}
+                  onChange={(e) => setPasswordConfirmation(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </motion.div>
+          </div> */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button type="submit" className="w-full" disabled={isLoading}>

@@ -9,7 +9,7 @@ export const useAuthStore = create((set, get) => ({
   isAuthenticated: false,
   isCheckingAuth: true, // like a loading state
 
-  signup: async (firstname, email, password) => {
+  signup: async (firstname, lastname, email, password) => {
     set({ isLoading: true, error: null });
 
     console.log(firstname, email, password);
@@ -19,6 +19,7 @@ export const useAuthStore = create((set, get) => ({
         BASE_URL + "/api/auth/signup",
         {
           firstname,
+          lastname,
           email,
           password,
         },
