@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "../components/ui/button";
+import PrivateNavbar from "@/components/PrivateNavbar";
 
 const AuthLayout = () => {
   const { isCheckingAuth, checkAuth, isAuthenticated, user, logout } =
@@ -19,7 +20,9 @@ const AuthLayout = () => {
 
   return (
     <div>
-      {user && <Button onClick={logout}>Logout</Button>}
+      {/* {user && <Button onClick={logout}>Logout</Button>} */}
+      {/* {user && <PrivateNavbar logout={logout} />} */}
+      {user && <PrivateNavbar />}
       <Outlet />
       <Toaster />
     </div>

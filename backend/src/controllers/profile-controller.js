@@ -4,7 +4,7 @@ const getAllActiveMembers = async (req, res) => {
   try {
     const activeMembers = await User.find({
       role: { $nin: ["pending", "banned"] },
-    }).select("fistname lastname role");
+    }).select("firstname lastname role");
 
     res.status(200).json({
       success: true,
