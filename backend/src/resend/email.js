@@ -8,8 +8,8 @@ require("dotenv").config();
 const sendVerificationTokenEmail = async (email, verificationToken) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      //   to: [process.env.RESEND_TEST_EMAIL],
+      from: "Delta Chi East Bay <sender@kenkot.net>",
+      // from: "Acme <onboarding@resend.dev>",
       to: [email],
       subject: "Verify Your Email Address",
       html: verificationTokenEmailTemplate.replace(
@@ -26,8 +26,8 @@ const sendVerificationTokenEmail = async (email, verificationToken) => {
 const sendWelcomeEmail = async (email, name) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      //   to: [process.env.RESEND_TEST_EMAIL],
+      // from: "Acme <onboarding@resend.dev>",
+      from: "Delta Chi East Bay <sender@kenkot.net>",
       to: [email],
       subject: "Welcome to the website!",
       html: welcomeEmailTemplate.replace("{name}", name),
@@ -41,8 +41,8 @@ const sendWelcomeEmail = async (email, name) => {
 const sendPasswordResetEmail = async (email, resetURL) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      //   to: [process.env.RESEND_TEST_EMAIL],
+      // from: "Acme <onboarding@resend.dev>",
+      from: "Delta Chi East Bay <sender@kenkot.net>",
       to: [email],
       subject: "Reset your password",
       html: `Click <a href="${resetURL}">here</a> to reset your password`,
@@ -56,8 +56,8 @@ const sendPasswordResetEmail = async (email, resetURL) => {
 const sendResetSuccessEmail = async (email) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      //   to: [process.env.RESEND_TEST_EMAIL],
+      // from: "Acme <onboarding@resend.dev>",
+      from: "Delta Chi East Bay <sender@kenkot.net>",
       to: [email],
       subject: "Password reset was successful",
       html: `Your password was reset successfully`,

@@ -14,7 +14,7 @@ const PrivateNavbar = () => {
         <div className="flex gap-4">
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profiles">Member Directory</Link>
-          <Link to="/profile">My Profile</Link>
+          <Link to="/profile/edit">Edit My Profile</Link>
         </div>
 
         {isModOrAdmin && (

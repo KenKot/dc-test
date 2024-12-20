@@ -19,6 +19,7 @@ import AccountDeactivatedPage from "./pages/AccountDeactivatedPage";
 import ProfilesPage from "./pages/private/ProfilesPage";
 import ProfilePage from "./pages/private/ProfilePage";
 import AdminDashboardPage from "./pages/private/AdminDashboardPage";
+import ProfileEditPage from "./pages/private/ProfileEditPage";
 
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
@@ -133,6 +134,14 @@ const App = () => {
           element={
             <ProtectRoute>
               <ProfilesPage />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectRoute>
+              <ProfileEditPage />
             </ProtectRoute>
           }
         />

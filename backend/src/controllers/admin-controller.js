@@ -55,7 +55,8 @@ const updateRole = async (req, res) => {
     if (previousRole === "pending") {
       //send welcome email
       await sendWelcomeEmail(
-        process.env.RESEND_TEST_EMAIL,
+        // process.env.RESEND_TEST_EMAIL,
+        userToUpdate.email,
         userToUpdate.firstname
       ); //for testing (resend cant send emails to other emails)
     }

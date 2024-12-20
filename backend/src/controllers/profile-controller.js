@@ -36,11 +36,15 @@ const getMemberById = async (req, res) => {
   }
 };
 
-//returns more sensitive data than "getMemberById" for only logged in user to see
+//returns more sensitive data than "getMemberById" for only logged in user to see,
+//doesn't id in params like getMemberById
+
+//I might already have the user info I want on the User Store,
+// so this function might be redundant
 const getMemberByIdToEdit = async (req, res) => {
   try {
     const member = {
-      id: req.user._id,
+      _id: req.user._id,
       firstname: req.user.firstname,
       lastname: req.user.lastname,
       email: req.user.email,
@@ -58,7 +62,7 @@ const getMemberByIdToEdit = async (req, res) => {
   }
 };
 
-const updateMember = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const member = {
       id: req.user._id,
@@ -83,5 +87,5 @@ module.exports = {
   getAllActiveMembers,
   getMemberById,
   getMemberByIdToEdit,
-  updateMember,
+  updateProfile,
 };

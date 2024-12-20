@@ -5,7 +5,7 @@ const {
   getAllActiveMembers,
   getMemberById,
   getMemberByIdToEdit,
-  updateMember,
+  updateProfile,
 } = require("../controllers/profile-controller");
 const verifyGeneralMember = require("../middlewares/verifyGeneralMember");
 const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
@@ -24,11 +24,11 @@ profileRouter.get(
   getMemberByIdToEdit
 );
 
-profileRouter.post(
+profileRouter.patch(
   "/profile/edit",
   verifyTokenAndUser,
   verifyGeneralMember,
-  updateMember
+  updateProfile
 );
 
 profileRouter.get(
