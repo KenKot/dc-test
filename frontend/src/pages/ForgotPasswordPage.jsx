@@ -9,14 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const { forgotPassword, message } = useAuthStore();
+  const navigate = useNavigate();
+
   async function onSubmit(e) {
     e.preventDefault();
     await forgotPassword(email);
+
+    // if (!error) {
+    // disable button
+    // }
   }
 
   return (
@@ -42,7 +49,12 @@ export default function ForgotPasswordPage() {
       </CardContent>
       <CardFooter className="flex justify-center">
         {message && <p className="text-sm text-green-500">{message}</p>}
-        <Button variant="link" className="px-0">
+
+        <Button
+          variant="link"
+          className="px-0"
+          onClick={() => navigate("/login")}
+        >
           Back to Login
         </Button>
       </CardFooter>

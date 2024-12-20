@@ -19,6 +19,8 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/admin", require("./routes/admin.js"));
 
+app.use("/api", require("./routes/profile.js"));
+
 connectDB();
 
 app.listen(PORT, () => {

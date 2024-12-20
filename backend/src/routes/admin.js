@@ -1,13 +1,13 @@
 const express = require("express");
 const adminRouter = express.Router();
 
-const verifyToken = require("../middlewares/verifyToken");
+const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
 const verifyModeratorOrAdmin = require("../middlewares/verifyModeratorOrAdmin");
 const { updateRole } = require("../controllers/admin-controller");
 
 adminRouter.post(
   "/update-role",
-  verifyToken,
+  verifyTokenAndUser,
   verifyModeratorOrAdmin,
   updateRole
 );

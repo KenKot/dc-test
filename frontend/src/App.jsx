@@ -38,7 +38,8 @@ const ProtectRoute = ({ children }) => {
   return children;
 };
 
-//logged in user shouldnt go to "signup/verifypassword/forgotpassword/login"
+//logged in user shouldnt go to "signup/verifypassword/forgotpassword/login",
+// take them to /dashboard instead
 const AuthenticatedUserRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
   if (isAuthenticated && user) {

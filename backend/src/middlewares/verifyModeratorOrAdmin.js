@@ -5,14 +5,16 @@ const User = require("../models/user");
 
 const verifyModeratorOrAdmin = async (req, res, next) => {
   try {
-    const user = await User.findById(req.id);
+    // const user = await User.findById(req.id);
 
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid user",
-        success: false,
-      });
-    }
+    // if (!user) {
+    //   return res.status(400).json({
+    //     message: "Invalid user",
+    //     success: false,
+    //   });
+    // }
+
+    const user = req.user;
 
     if (user.role !== "moderator" && user.role !== "admin") {
       return res.status(400).json({
@@ -21,7 +23,7 @@ const verifyModeratorOrAdmin = async (req, res, next) => {
       });
     }
 
-    req.role = user.role;
+    // req.role = user.role;
 
     next();
   } catch (error) {

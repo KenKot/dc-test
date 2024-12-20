@@ -248,13 +248,15 @@ const resetPassword = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
-    const user = await User.findById(req.id);
+    // const user = await User.findById(req.id);
 
-    if (!user) {
-      return res
-        .status(400)
-        .json({ message: "user not found", success: false });
-    }
+    // if (!user) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "user not found", success: false });
+    // }
+
+    const user = req.user;
 
     res.status(200).json({
       success: true,

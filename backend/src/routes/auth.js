@@ -11,7 +11,7 @@ const {
   checkAuth,
 } = require("../controllers/auth-controller");
 
-const verifyToken = require("../middlewares/verifyToken");
+const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
 
 authRouter.post("/signup", signup);
 authRouter.post("/verify-email", verifyEmail);
@@ -22,6 +22,6 @@ authRouter.post("/logout", logout);
 authRouter.post("/forgot-password", forgotPassword);
 authRouter.post("/reset-password/:token", resetPassword);
 
-authRouter.get("/check-auth", verifyToken, checkAuth);
+authRouter.get("/check-auth", verifyTokenAndUser, checkAuth);
 
 module.exports = authRouter;

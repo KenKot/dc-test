@@ -128,15 +128,6 @@ export const useAuthStore = create((set, get) => ({
 
     set({ isCheckingAuth: true, error: null });
 
-    // BACKEND
-    // res.status(200).json({
-    //   _id: user._id, // remove?
-    //   firstname: user.firstname,
-    //   lastname: user.lastname,
-    //   email: user.email,
-    //   isVerified: user.isVerified,
-    // });
-
     try {
       const response = await axios.get(BASE_URL + "/api/auth/check-auth", {
         withCredentials: true,
@@ -194,12 +185,8 @@ export const useAuthStore = create((set, get) => ({
         { withCredentials: true }
       );
 
-      console.log("@@@1", response.data.message);
-
       set({ isLoading: false, message: response.data.message });
     } catch (error) {
-      console.log("@@@2", error.response.data.message);
-
       set({ isLoading: false, error: error.response?.data?.message });
       console.log(error);
       throw error;

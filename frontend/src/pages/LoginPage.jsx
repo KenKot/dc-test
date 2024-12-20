@@ -89,6 +89,15 @@ export default function LoginPage() {
               Create an account
             </Link>
           </p>
+          <p className="text-sm">
+            Forgot your password?{" "}
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
+              Reset Your Password
+            </Link>
+          </p>
         </div>
       </motion.div>
     </div>

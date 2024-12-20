@@ -54,7 +54,6 @@ const updateRole = async (req, res) => {
     // changing role from "pending" to something else is the only time we want to send welcome email
     if (previousRole === "pending") {
       //send welcome email
-      //   await sendWelcomeEmail(userToUpdate.firstname, userToUpdate.role);
       await sendWelcomeEmail(
         process.env.RESEND_TEST_EMAIL,
         userToUpdate.firstname
