@@ -23,7 +23,7 @@ const verifyModeratorOrAdmin = async (req, res, next) => {
       });
     }
 
-    // req.role = user.role;
+    req.role = user.role;
 
     next();
   } catch (error) {

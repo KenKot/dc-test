@@ -20,6 +20,7 @@ import ProfilesPage from "./pages/private/ProfilesPage";
 import ProfilePage from "./pages/private/ProfilePage";
 import AdminDashboardPage from "./pages/private/AdminDashboardPage";
 import ProfileEditPage from "./pages/private/ProfileEditPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
@@ -162,6 +163,7 @@ const App = () => {
           }
         />
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
