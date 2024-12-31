@@ -52,10 +52,10 @@ const CurrentMembers = () => {
       <CardContent className="p-6">
         <h2 className="text-2xl font-bold mb-4">Current Members</h2>
 
-        {currentMembers.length === 0 ? (
+        {currentMembers?.length === 0 ? (
           <p>There are no current members</p>
         ) : (
-          currentMembers.map((member) => (
+          currentMembers?.map((member) => (
             <CurrentMemberCard
               key={member._id}
               firstName={member.firstname}

@@ -12,10 +12,11 @@ const sendVerificationTokenEmail = async (email, verificationToken) => {
       // from: "Acme <onboarding@resend.dev>",
       to: [email],
       subject: "Verify Your Email Address",
-      html: verificationTokenEmailTemplate.replace(
-        "{verificationToken}",
-        verificationToken
-      ),
+      html: `Here is your activation code: ${verificationToken}<br>Click <a href="${process.env.CLIENT_URL}/verify-email">here</a> to reset enter your activation code.`,
+      // html: verificationTokenEmailTemplate.replace(
+      //   "{verificationToken}",
+      //   verificationToken
+      // ),
     });
   } catch (error) {
     console.error("error sending verification email: " + error);

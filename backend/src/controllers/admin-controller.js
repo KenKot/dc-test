@@ -1,14 +1,10 @@
-require("dotenv").config(); //testing
-
 const User = require("../models/user");
 const { sendWelcomeEmail } = require("../resend/email");
 
 // Shouldnt be able to change user back to pending.
 // Should send email after updating from pending to member
 
-//since this sends email, it should be separate function
 const updateRole = async (req, res) => {
-  //as of now I have: req.id, and req.role because of middlewares
   try {
     const { userIdToUpdate, newRole } = req.body;
 
@@ -34,9 +30,9 @@ const updateRole = async (req, res) => {
 
     // Role restrictions
     if (
-      req.role === userToUpdate.role || // Prevent same-level updates
-      (req.role === "moderator" && userToUpdate.role === "admin") || // Mods can't update admins
-      (req.role === "moderator" && newRole === "moderator") // Mods can't promote to mod
+      req.user.role === userToUpdate.role || // Prevent same-level updates
+      (req.user.role === "moderator" && userToUpdate.role === "admin") || // Mods can't update admins
+      (req.user.role === "moderator" && newRole === "moderator") // Mods can't promote to mod
     ) {
       return res
         .status(403)
@@ -45,7 +41,7 @@ const updateRole = async (req, res) => {
 
     // Prevent downgrading admins to non-admin roles
     if (
-      req.role === "admin" &&
+      req.user.role === "admin" &&
       newRole !== "admin" &&
       userToUpdate.role === "admin"
     ) {
@@ -90,6 +86,7 @@ const getPendingMembers = async (req, res) => {
       pendingMembers,
     });
   } catch (error) {
+    console.error("Error getting pending members:", error);
     res
       .status(500)
       .json({ success: false, message: "Unable to get pending members" });
@@ -100,13 +97,15 @@ const getCurrentMembers = async (req, res) => {
   try {
     let currentMembers;
 
+    console.log(req.user.role, "!!");
+
     //moderators only can change members/alumni
     //admin can do everything except demote an admin
-    if (req.role === "moderator") {
+    if (req.user.role === "moderator") {
       currentMembers = await User.find({
         role: { $in: ["member", "alumni"] },
       }).select("firstname lastname email role");
-    } else if (req.role === "admin") {
+    } else if (req.user.role === "admin") {
       currentMembers = await User.find({
         role: { $in: ["moderator", "member", "alumni"] },
       }).select("firstname lastname email role");
@@ -118,6 +117,7 @@ const getCurrentMembers = async (req, res) => {
       currentMembers,
     });
   } catch (error) {
+    console.error("Error getting current members", error);
     res
       .status(500)
       .json({ success: false, message: "Unable to get current members" });
@@ -136,7 +136,7 @@ const getBannedMembers = async (req, res) => {
       bannedMembers,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Erro getting banned members: ", error);
     res
       .status(500)
       .json({ success: false, message: "Unable to get banned members" });

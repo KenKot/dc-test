@@ -9,7 +9,7 @@ const verifyTokenAndUser = async (req, res, next) => {
     if (!token) {
       return res
         .status(401)
-        .json({ message: "Unauthorized: No token provided" });
+        .json({ success: false, message: "Unauthorized: No token provided" });
     }
 
     // Verify the token
@@ -20,17 +20,24 @@ const verifyTokenAndUser = async (req, res, next) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (err) {
+    console.error("Error in verifyToken middleware: ", err.message);
+
     if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Unauthorized: Token expired" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: Token expired" });
     }
-    console.error("Error in verifyToken middleware:", err.message);
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 

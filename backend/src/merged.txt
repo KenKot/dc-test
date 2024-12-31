@@ -1,0 +1,790 @@
+const User = require("../models/user");
+const { sendWelcomeEmail } = require("../resend/email");
+
+// Shouldnt be able to change user back to pending.
+// Should send email after updating from pending to member
+
+const updateRole = async (req, res) => {
+  try {
+    const { userIdToUpdate, newRole } = req.body;
+
+    if (!userIdToUpdate || !newRole) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User ID and new role are required" });
+    }
+
+    const allowedRoles = ["moderator", "member", "alumni", "banned"];
+    if (!allowedRoles.includes(newRole)) {
+      return res.status(400).json({ success: false, message: "Invalid role" });
+    }
+
+    const userToUpdate = await User.findById(userIdToUpdate);
+
+    if (!userToUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Role restrictions
+    if (
+      req.user.role === userToUpdate.role || // Prevent same-level updates
+      (req.user.role === "moderator" && userToUpdate.role === "admin") || // Mods can't update admins
+      (req.user.role === "moderator" && newRole === "moderator") // Mods can't promote to mod
+    ) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Permission denied" });
+    }
+
+    // Prevent downgrading admins to non-admin roles
+    if (
+      req.user.role === "admin" &&
+      newRole !== "admin" &&
+      userToUpdate.role === "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Admins cannot downgrade other admins to non-admin roles.",
+      });
+    }
+
+    const previousRole = userToUpdate.role;
+
+    userToUpdate.role = newRole;
+    await userToUpdate.save();
+
+    if (previousRole === "pending") {
+      await sendWelcomeEmail(userToUpdate.email, userToUpdate.firstname);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `User's role successfully updated to ${newRole}`,
+    });
+  } catch (error) {
+    console.error("Error updating role:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Unable to update user's role" });
+  }
+};
+
+const getPendingMembers = async (req, res) => {
+  //make them verify their email?
+  try {
+    const pendingMembers = await User.find({
+      role: "pending",
+      isVerified: true,
+    }).select("firstname lastname email");
+
+    res.status(200).json({
+      success: true,
+      message: "Pending members successfully returned",
+      pendingMembers,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Unable to get pending members" });
+  }
+};
+
+const getCurrentMembers = async (req, res) => {
+  try {
+    let currentMembers;
+
+    console.log(req.user.role, "!!");
+
+    //moderators only can change members/alumni
+    //admin can do everything except demote an admin
+    if (req.user.role === "moderator") {
+      currentMembers = await User.find({
+        role: { $in: ["member", "alumni"] },
+      }).select("firstname lastname email role");
+    } else if (req.user.role === "admin") {
+      currentMembers = await User.find({
+        role: { $in: ["moderator", "member", "alumni"] },
+      }).select("firstname lastname email role");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Current members successfully returned",
+      currentMembers,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Unable to get current members" });
+  }
+};
+
+const getBannedMembers = async (req, res) => {
+  try {
+    const bannedMembers = await User.find({ role: "banned" }).select(
+      "firstname lastname email"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Banned members successfully returned",
+      bannedMembers,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Unable to get banned members" });
+  }
+};
+
+module.exports = {
+  updateRole,
+  getPendingMembers,
+  getCurrentMembers,
+  getBannedMembers,
+};
+const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const {
+  sendVerificationTokenEmail,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+} = require("../resend/email");
+
+const generateToken = require("../utils/generateToken.js");
+
+const signup = async (req, res) => {
+  try {
+    const { firstname, lastname, email, password } = req.body;
+
+    // use validator or mongofunction
+    if (!firstname || !lastname || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields",
+      });
+    }
+
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = generateToken();
+
+    const user = await User.create({
+      firstname,
+      lastname,
+      email,
+      password: hashedPassword,
+      verificationToken,
+    });
+
+    await sendVerificationTokenEmail(user.email, verificationToken); // resend/email.js
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully!",
+    });
+  } catch (error) {
+    console.log("Error signing up user: " + error);
+    res.status(500).json({ success: false, message: "Unable to sign up user" });
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { verificationToken } = req.body;
+
+    const user = await User.findOne({
+      verificationToken,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification token",
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "14d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true, // cookie cannot be accessed by client
+      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
+      sameSite: "strict", // cookie is not sent if the website is on a different domain
+      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.log("error verifying email: " + error);
+    res.status(500).json({ success: false, message: "Unable to verify user" });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password are required" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const isVerified = user.isVerified;
+
+    if (!isVerified) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not verified" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "14d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true, // cookie cannot be accessed by client
+      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
+      sameSite: "strict", // cookie is not sent if the website is on a different domain
+      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.log("Error logging in: " + error);
+    res.status(500).json({ success: false, message: "Unable to log in" });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Error during logout: ", error);
+    res.status(500).json({ success: false, message: "Logout failed" });
+  }
+};
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email)
+      return res
+        .status(400)
+        .json({ success: false, message: "Email required" });
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const resetPasswordToken = generateToken();
+    const resetPasswordExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordExpiresAt = resetPasswordExpiresAt;
+
+    await user.save();
+
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetPasswordToken}`
+    ); // resend/email.js
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset email sent" });
+  } catch (error) {
+    console.log("error sending password reset email: " + error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to complete forgot password process",
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body; //new password
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+      });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+
+    await user.save();
+
+    await sendResetSuccessEmail(user.email);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    console.log("Error resetting password: " + error);
+    res
+      .status(500)
+      .json({ success: false, message: "Unable to update password" });
+  }
+};
+
+const checkAuth = async (req, res) => {
+  // verifyTokenAndUser() middleware puts User document on req object
+  try {
+    const user = req.user;
+
+    res.status(200).json({
+      success: true,
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+      },
+      message: "Checked authorization successfully",
+    });
+  } catch (error) {
+    console.log("Error checking user's auth: " + error);
+    res.status(400).json({ success: false, message: "Unauthorized" });
+  }
+};
+
+module.exports = {
+  signup,
+  login,
+  logout,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  checkAuth,
+};
+const User = require("../models/user");
+
+const getAllActiveMembers = async (req, res) => {
+  try {
+    const activeMembers = await User.find({
+      role: { $nin: ["pending", "banned"] },
+    }).select("firstname lastname role");
+
+    res.status(200).json({
+      success: true,
+      message: "All active users returned successfully",
+      activeMembers,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed retreiving users" });
+  }
+};
+
+const getMemberById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const member = await User.findById(id).select("firstname lastname role");
+
+    res.status(200).json({
+      success: true,
+      message: "Member returned successfully",
+      member,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed retreiving users" });
+  }
+};
+
+//returns more sensitive data than "getMemberById", for only logged in user to see,
+//doesn't id in params like getMemberById
+
+const getMemberByIdToEdit = async (req, res) => {
+  try {
+    // Prune this such as: password, verificationToken, etc.
+    const member = {
+      _id: req.user._id,
+      firstname: req.user.firstname,
+      lastname: req.user.lastname,
+      email: req.user.email,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Member returned successfully",
+      member,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed retreiving member" });
+  }
+};
+
+// IN PROGRESS
+const updateProfile = async (req, res) => {
+  try {
+    // const {DateofBirth, aboutme} = req.body;     // don't let them edit f/lastname? Let admin see old name?
+
+    // const member = {
+    //   id: req.user._id,
+    //   firstname: req.user.firstname,
+    //   lastname: req.user.lastname,
+    //   email: req.user.email,
+    // };
+
+    res.status(200).json({
+      success: true,
+      message: "Member returned successfully",
+      member,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed retreiving member" });
+  }
+};
+
+module.exports = {
+  getAllActiveMembers,
+  getMemberById,
+  getMemberByIdToEdit,
+  updateProfile,
+};
+const verifyGeneralMember = (req, res, next) => {
+  try {
+    const { role } = req.user;
+
+    const validRoles = ["admin", "moderator", "member", "alumni"];
+    if (!validRoles.includes(role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied: Insufficient privileges",
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error in verifyGeneralMember middleware:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports = verifyGeneralMember;
+// Verifies requester is "moderator" or "admin",
+
+const User = require("../models/user");
+
+const verifyModeratorOrAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== "moderator" && req.user.role !== "admin") {
+      return res.status(400).json({
+        message: "Improper role",
+        success: false,
+      });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = verifyModeratorOrAdmin;
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+// Middleware to verify JWT and attach user to request
+const verifyTokenAndUser = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: No token provided" });
+    }
+
+    // Verify the token
+    const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = decodedObj;
+
+    // Find the user in the database
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error("Error in verifyToken middleware: ", err.message);
+
+    if (err.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: Token expired" });
+    }
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports = verifyTokenAndUser;
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema(
+  {
+    firstname: {
+      type: String,
+      required: [true, "Please provide a first name"],
+    },
+    lastname: {
+      type: String,
+      required: [true, "Please provide a last name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide an email"],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "moderator", "member", "alumni", "pending", "banned"],
+      default: "pending",
+    },
+    verificationToken: String,
+    resetPasswordToken: String,
+    resetPasswordExpiresAt: Date,
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model("User", userSchema);
+module.exports = User;
+const express = require("express");
+const adminRouter = express.Router();
+
+const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
+const verifyModeratorOrAdmin = require("../middlewares/verifyModeratorOrAdmin");
+const {
+  updateRole,
+  getPendingMembers,
+  getCurrentMembers,
+  getBannedMembers,
+} = require("../controllers/admin-controller");
+
+adminRouter.post(
+  "/update-role",
+  verifyTokenAndUser,
+  verifyModeratorOrAdmin,
+  updateRole
+);
+
+adminRouter.get(
+  "/pending-members",
+  verifyTokenAndUser,
+  verifyModeratorOrAdmin,
+  getPendingMembers
+);
+
+adminRouter.get(
+  "/current-members",
+  verifyTokenAndUser,
+  verifyModeratorOrAdmin,
+  getCurrentMembers
+);
+
+adminRouter.get(
+  "/banned-members",
+  verifyTokenAndUser,
+  verifyModeratorOrAdmin,
+  getBannedMembers
+);
+module.exports = adminRouter;
+const express = require("express");
+const authRouter = express.Router();
+
+const {
+  signup,
+  login,
+  logout,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  checkAuth,
+} = require("../controllers/auth-controller");
+
+const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
+
+authRouter.post("/signup", signup);
+authRouter.post("/verify-email", verifyEmail);
+
+authRouter.post("/login", login);
+authRouter.post("/logout", logout);
+
+authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/reset-password/:token", resetPassword);
+
+authRouter.get("/check-auth", verifyTokenAndUser, checkAuth);
+
+module.exports = authRouter;
+const express = require("express");
+const profileRouter = express.Router();
+
+const {
+  getAllActiveMembers,
+  getMemberById,
+  getMemberByIdToEdit,
+  updateProfile,
+} = require("../controllers/profile-controller");
+const verifyGeneralMember = require("../middlewares/verifyGeneralMember");
+const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
+
+profileRouter.get(
+  "/profiles",
+  verifyTokenAndUser,
+  verifyGeneralMember,
+  getAllActiveMembers
+);
+
+profileRouter.get(
+  "/profile/edit",
+  verifyTokenAndUser,
+  verifyGeneralMember,
+  getMemberByIdToEdit
+);
+
+profileRouter.patch(
+  "/profile/edit",
+  verifyTokenAndUser,
+  verifyGeneralMember,
+  updateProfile
+);
+
+profileRouter.get(
+  "/profile/:id",
+  verifyTokenAndUser,
+  verifyGeneralMember,
+  getMemberById
+);
+
+module.exports = profileRouter;
+const morgan = require("morgan"); //testing
+
+const PORT = 4000;
+require("dotenv").config();
+
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const connectDB = require("./config/database.js");
+
+const express = require("express");
+const app = express();
+
+// MIDDLEWARES
+app.use(morgan("dev")); //testing
+app.use(cookieParser());
+app.use(express.json()); // parse JSON bodies
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
+app.use("/api/auth", require("./routes/auth.js"));
+app.use("/api/admin", require("./routes/admin.js"));
+
+app.use("/api", require("./routes/profile.js"));
+
+connectDB();
+
+app.listen(PORT, () => {
+  console.log(`listening on port: ${PORT}`);
+});

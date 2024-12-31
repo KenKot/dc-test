@@ -28,10 +28,9 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "moderator", "member", "alumni", "pending", "banned"],
       default: "pending",
     },
+    verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
-    verificationToken: String,
-    verificationExpiresAt: Date,
   },
   { timestamps: true }
 );
