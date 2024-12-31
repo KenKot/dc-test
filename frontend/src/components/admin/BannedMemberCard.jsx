@@ -10,7 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const BannedMemberCard = ({ firstName, lastName, email, onUnban }) => {
+const BannedMemberCard = ({
+  firstName,
+  lastName,
+  email,
+  banDetails,
+  onUnban,
+}) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   return (
@@ -22,6 +28,27 @@ const BannedMemberCard = ({ firstName, lastName, email, onUnban }) => {
               {firstName} {lastName}
             </h3>
             <p className="text-sm text-muted-foreground">{email}</p>
+
+            {/* Show ban details if available */}
+            {banDetails && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                <p>
+                  <strong>Reason:</strong> {banDetails.reason || "N/A"}
+                </p>
+                {banDetails?.banDate && (
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {banDetails?.banDate.toLocaleDateString()}
+                  </p>
+                )}
+                {banDetails?.issuedBy && (
+                  <p>
+                    <strong>Banned By:</strong> {banDetails?.issuedBy.firstname}{" "}
+                    {banDetails?.issuedBy.lastname}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex mt-4 md:mt-0 space-x-2 items-center">
             <Button

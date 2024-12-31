@@ -6,7 +6,7 @@ const { sendWelcomeEmail } = require("../resend/email");
 
 const updateRole = async (req, res) => {
   try {
-    const { userIdToUpdate, newRole } = req.body;
+    const { userIdToUpdate, newRole, banReason } = req.body;
 
     if (!userIdToUpdate || !newRole) {
       return res
@@ -54,6 +54,19 @@ const updateRole = async (req, res) => {
     const previousRole = userToUpdate.role;
 
     userToUpdate.role = newRole;
+
+    // If we are banning the user, set ban details
+    if (newRole === "banned") {
+      userToUpdate.banDetails = {
+        reason: banReason || "No reason specified",
+        issuedBy: req.user._id, // The admin or moderator banning the user
+        date: new Date(),
+      };
+    } else if (previousRole === "banned") {
+      //  clear banDetails if unbanning or changing to a different role
+      userToUpdate.banDetails = undefined;
+    }
+
     await userToUpdate.save();
 
     if (previousRole === "pending") {
@@ -126,9 +139,9 @@ const getCurrentMembers = async (req, res) => {
 
 const getBannedMembers = async (req, res) => {
   try {
-    const bannedMembers = await User.find({ role: "banned" }).select(
-      "firstname lastname email"
-    );
+    const bannedMembers = await User.find({ role: "banned" })
+      .select("firstname lastname email banDetails")
+      .populate("banDetails.issuedBy", "firstname lastname");
 
     res.status(200).json({
       success: true,

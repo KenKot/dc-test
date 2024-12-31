@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
     verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
+    banDetails: {
+      reason: { type: String },
+      issuedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      date: { type: Date },
+    },
   },
   { timestamps: true }
 );

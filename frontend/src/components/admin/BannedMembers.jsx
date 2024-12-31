@@ -56,6 +56,7 @@ const BannedMembers = () => {
               firstName={member.firstname}
               lastName={member.lastname}
               email={member.email}
+              banDetails={member.banDetails}
               onUnban={() => unbanMember(member._id)}
             />
           ))

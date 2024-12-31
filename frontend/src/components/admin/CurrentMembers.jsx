@@ -26,21 +26,23 @@ const CurrentMembers = () => {
     fetchCurrentMembers();
   }, []);
 
-  const updateRole = async (id, newRole) => {
+  const updateRole = async (id, newRole, banReason) => {
     try {
+      let payLoad = {
+        userIdToUpdate: id,
+        newRole: newRole,
+      };
+
+      if (banReason) payLoad.banReason = banReason;
+
       const response = await axios.post(
         BASE_URL + "/api/admin/update-role",
-        {
-          userIdToUpdate: id,
-          newRole: newRole,
-        },
+        payLoad,
         { withCredentials: true }
       );
 
       setCurrentMembers((members) =>
-        members.map((member) =>
-          member._id === id ? { ...member, role: newRole } : member
-        )
+        members.filter((member) => member._id !== id)
       );
     } catch (error) {
       console.log(error);
@@ -53,7 +55,7 @@ const CurrentMembers = () => {
         <h2 className="text-2xl font-bold mb-4">Current Members</h2>
 
         {currentMembers?.length === 0 ? (
-          <p>There are no current members</p>
+          <div>There are no current members</div>
         ) : (
           currentMembers?.map((member) => (
             <CurrentMemberCard
@@ -62,7 +64,9 @@ const CurrentMembers = () => {
               lastName={member.lastname}
               email={member.email}
               role={member.role}
-              onUpdate={(newRole) => updateRole(member._id, newRole)}
+              onUpdate={(newRole, banReason) =>
+                updateRole(member._id, newRole, banReason)
+              }
             />
           ))
         )}
