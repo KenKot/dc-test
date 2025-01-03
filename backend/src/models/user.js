@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Please provide a password"],
+      // Minimum Length: 8 characters.
+      // At Least One Lowercase Letter.
+      // At Least One Uppercase Letter.
+      // At Least One Number.
+      // At Least One Symbol.
     },
     isVerified: {
       type: Boolean,

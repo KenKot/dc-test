@@ -12,7 +12,7 @@ const sendVerificationTokenEmail = async (email, verificationToken) => {
       // from: "Acme <onboarding@resend.dev>",
       to: [email],
       subject: "Verify Your Email Address",
-      html: `Here is your activation code: ${verificationToken}<br>Click <a href="${process.env.CLIENT_URL}/verify-email">here</a> to reset enter your activation code.`,
+      html: `Here is your activation code: ${verificationToken}<br>You can click <a href="${process.env.CLIENT_URL}/verify-email">here</a> to enter your activation code if you have closed the window.`,
       // html: verificationTokenEmailTemplate.replace(
       //   "{verificationToken}",
       //   verificationToken

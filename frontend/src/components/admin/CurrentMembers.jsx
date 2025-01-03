@@ -41,9 +41,14 @@ const CurrentMembers = () => {
         { withCredentials: true }
       );
 
-      setCurrentMembers((members) =>
-        members.filter((member) => member._id !== id)
-      );
+      setCurrentMembers((members) => {
+        return members.map((member) => {
+          if (member._id === id) {
+            return { ...member, role: newRole };
+          }
+          return member;
+        });
+      });
     } catch (error) {
       console.log(error);
     }
