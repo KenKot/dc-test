@@ -2,24 +2,22 @@ const User = require("../models/user");
 const { sendWelcomeEmail } = require("../resend/email");
 const {
   validateUpdateRoleData,
+  validateUpdateRoleRestrictions,
 } = require("../utils/validations/adminValidations");
-
-// Shouldnt be able to change user back to pending.
-// Should send email after updating from pending to member
 
 const updateRole = async (req, res) => {
   try {
     const { userIdToUpdate, newRole, banReason } = req.body;
-    const updateRoleValidation = validateUpdateRoleData(
+    const updateRoleFormValidation = validateUpdateRoleData(
       userIdToUpdate,
       newRole,
       banReason
     );
 
-    if (!updateRoleValidation.isValid) {
+    if (!updateRoleFormValidation.isValid) {
       return res
         .status(400)
-        .json({ success: false, message: updateRoleValidation.message });
+        .json({ success: false, message: updateRoleFormValidation.message });
     }
 
     const userToUpdate = await User.findById(userIdToUpdate);
@@ -31,31 +29,20 @@ const updateRole = async (req, res) => {
       });
     }
 
-    // Role restrictions
-    if (
-      req.user.role === userToUpdate.role || // Prevent same-level updates
-      (req.user.role === "moderator" && userToUpdate.role === "admin") || // Mods can't update admins
-      (req.user.role === "moderator" && newRole === "moderator") // Mods can't promote to mod
-    ) {
+    // Role restriction checks
+    const roleRestrictionValidation = validateUpdateRoleRestrictions(
+      req.user.role,
+      userToUpdate.role,
+      newRole
+    );
+
+    if (!roleRestrictionValidation.isValid) {
       return res
         .status(403)
-        .json({ success: false, message: "Permission denied" });
-    }
-
-    // Prevent downgrading admins to non-admin roles
-    if (
-      req.user.role === "admin" &&
-      newRole !== "admin" &&
-      userToUpdate.role === "admin"
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: "Admins cannot downgrade other admins to non-admin roles.",
-      });
+        .json({ success: false, message: roleRestrictionValidation.message });
     }
 
     const previousRole = userToUpdate.role;
-
     userToUpdate.role = newRole;
 
     // If we are banning the user, set ban details
@@ -72,6 +59,7 @@ const updateRole = async (req, res) => {
 
     await userToUpdate.save();
 
+    // send welcome email if they're a new user
     if (previousRole === "pending") {
       await sendWelcomeEmail(userToUpdate.email, userToUpdate.firstname);
     }
@@ -112,8 +100,6 @@ const getPendingMembers = async (req, res) => {
 const getCurrentMembers = async (req, res) => {
   try {
     let currentMembers;
-
-    console.log(req.user.role, "!!");
 
     //moderators only can change members/alumni
     //admin can do everything except demote an admin
