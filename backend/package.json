@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.3",
     "morgan": "^1.10.0",
-    "resend": "^4.0.1"
+    "resend": "^4.0.1",
+    "validator": "^13.12.0"
   }
 }

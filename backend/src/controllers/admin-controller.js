@@ -1,5 +1,8 @@
 const User = require("../models/user");
 const { sendWelcomeEmail } = require("../resend/email");
+const {
+  validateUpdateRoleData,
+} = require("../utils/validations/adminValidations");
 
 // Shouldnt be able to change user back to pending.
 // Should send email after updating from pending to member
@@ -7,16 +10,16 @@ const { sendWelcomeEmail } = require("../resend/email");
 const updateRole = async (req, res) => {
   try {
     const { userIdToUpdate, newRole, banReason } = req.body;
+    const updateRoleValidation = validateUpdateRoleData(
+      userIdToUpdate,
+      newRole,
+      banReason
+    );
 
-    if (!userIdToUpdate || !newRole) {
+    if (!updateRoleValidation.isValid) {
       return res
         .status(400)
-        .json({ success: false, message: "User ID and new role are required" });
-    }
-
-    const allowedRoles = ["moderator", "member", "alumni", "banned"];
-    if (!allowedRoles.includes(newRole)) {
-      return res.status(400).json({ success: false, message: "Invalid role" });
+        .json({ success: false, message: updateRoleValidation.message });
     }
 
     const userToUpdate = await User.findById(userIdToUpdate);

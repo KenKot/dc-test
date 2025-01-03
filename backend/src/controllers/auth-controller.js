@@ -9,16 +9,27 @@ const {
 } = require("../resend/email");
 
 const generateToken = require("../utils/generateToken.js");
+const {
+  validateSignUpData,
+  validateLoginData,
+  validateForgotPasswordData,
+  validateResetPasswordData,
+} = require("../utils/validations/authValidations.js");
 
 const signup = async (req, res) => {
   try {
     const { firstname, lastname, email, password } = req.body;
+    const signUpValidation = validateSignUpData(
+      firstname,
+      lastname,
+      email,
+      password
+    );
 
-    // use validator or mongofunction
-    if (!firstname || !lastname || !email || !password) {
+    if (!signUpValidation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Please provide all required fields",
+        message: signUpValidation.message,
       });
     }
 
@@ -102,14 +113,15 @@ const verifyEmail = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const loginValidation = validateLoginData(email, password);
 
-    if (!user || !password) {
+    if (!loginValidation.isValid) {
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required" });
+        .json({ success: false, message: loginValidation.message });
     }
 
+    const user = await User.findOne({ email });
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -172,10 +184,12 @@ const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email)
+    const forgotPasswordValidation = validateForgotPasswordData(email);
+
+    if (!forgotPasswordValidation.isValid)
       return res
         .status(400)
-        .json({ success: false, message: "Email required" });
+        .json({ success: false, message: emailValidation.message });
 
     const user = await User.findOne({ email });
 
@@ -215,10 +229,12 @@ const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body; //new password
 
-    if (!password) {
+    const resetPasswordValidation = validateResetPasswordData(password);
+
+    if (!resetPasswordValidation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 8 characters long",
+        message: resetPasswordValidation.message,
       });
     }
 
@@ -255,8 +271,8 @@ const resetPassword = async (req, res) => {
 };
 
 const checkAuth = async (req, res) => {
-  // verifyTokenAndUser() middleware puts User document on req object
   try {
+  // verifyTokenAndUser() middleware puts User document on req object
     const user = req.user;
 
     res.status(200).json({
