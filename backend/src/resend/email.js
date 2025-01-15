@@ -31,7 +31,8 @@ const sendWelcomeEmail = async (email, name) => {
       from: "Delta Chi East Bay <sender@kenkot.net>",
       to: [email],
       subject: "Welcome to the website!",
-      html: welcomeEmailTemplate.replace("{name}", name),
+      // html: welcomeEmailTemplate.replace("{name}", name),
+      html: `Welcome to Delta Chi East Bay ${name}! We're glad to have you!`,
     });
   } catch (error) {
     console.error("error sending welcome email: " + error);

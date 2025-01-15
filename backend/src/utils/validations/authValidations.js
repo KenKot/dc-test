@@ -18,7 +18,15 @@ const validateSignUpData = (firstname, lastname, email, password) => {
     };
   }
 
-  if (!validator.isEmail(email)) {
+  if (!validator.isAlpha(firstname) || !validator.isAlpha(lastname)) {
+    //alphabet characters only!
+    return {
+      isValid: false,
+      message: "Names must only contain Characters",
+    };
+  }
+
+  if (!validator.isEmail(email) && !validator.isLowerCase(email)) {
     return { isValid: false, message: "Email is not valid" };
   }
 

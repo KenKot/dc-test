@@ -39,13 +39,14 @@ const userSchema = new mongoose.Schema(
       // At Least One Symbol.
     },
     isVerified: {
+      // has user used the email code to verify it's actually their email?
       type: Boolean,
       default: false,
     },
     role: {
       type: String,
       enum: ["admin", "moderator", "member", "alumni", "pending", "banned"],
-      default: "pending",
+      default: "pending", // admin hasn't approved member yet
     },
     verificationToken: String,
     resetPasswordToken: String,

@@ -1,8 +1,6 @@
 const morgan = require("morgan"); //testing
 
-const PORT = 4000;
 require("dotenv").config();
-
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const connectDB = require("./config/database.js");
@@ -23,6 +21,4 @@ app.use("/api", require("./routes/profile.js"));
 
 connectDB();
 
-app.listen(PORT, () => {
-  console.log(`listening on port: ${PORT}`);
-});
+module.exports = app;

@@ -122,6 +122,12 @@ const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -272,7 +278,7 @@ const resetPassword = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
-  // verifyTokenAndUser() middleware puts User document on req object
+    // verifyTokenAndUser() middleware puts User document on req object
     const user = req.user;
 
     res.status(200).json({
