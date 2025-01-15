@@ -1,3 +1,4 @@
+const logger = require("../utils/logger");
 const verifyGeneralMember = (req, res, next) => {
   try {
     const { role } = req.user;
@@ -12,7 +13,7 @@ const verifyGeneralMember = (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error in verifyGeneralMember middleware:", error.message);
+    logger.error("Error in verifyGeneralMember middleware:", error.message);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

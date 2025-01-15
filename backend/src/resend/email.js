@@ -1,9 +1,10 @@
-const resend = require("./config");
+const resend = require("../config/resend");
 const {
   verificationTokenEmailTemplate,
   welcomeEmailTemplate,
 } = require("./email-templates");
-require("dotenv").config();
+const logger = require("../utils/logger");
+const { CLIENT_URL } = require("../config/envConfig");
 
 const sendVerificationTokenEmail = async (email, verificationToken) => {
   try {
@@ -12,15 +13,16 @@ const sendVerificationTokenEmail = async (email, verificationToken) => {
       // from: "Acme <onboarding@resend.dev>",
       to: [email],
       subject: "Verify Your Email Address",
-      html: `Here is your activation code: ${verificationToken}<br>You can click <a href="${process.env.CLIENT_URL}/verify-email">here</a> to enter your activation code if you have closed the window.`,
+      html: `Here is your activation code: ${verificationToken}<br>You can click <a href="${CLIENT_URL}/verify-email">here</a> to enter your activation code if you have closed the window.`,
       // html: verificationTokenEmailTemplate.replace(
       //   "{verificationToken}",
       //   verificationToken
       // ),
     });
+    logger.info(`Verification token sent to ${email}`); // Log success message
   } catch (error) {
-    console.error("error sending verification email: " + error);
-    throw new Error("error sending verification email");
+    logger.error("Error sending verification email: " + error); // Log error using logger
+    throw new Error("Error sending verification email");
   }
 };
 
@@ -34,9 +36,10 @@ const sendWelcomeEmail = async (email, name) => {
       // html: welcomeEmailTemplate.replace("{name}", name),
       html: `Welcome to Delta Chi East Bay ${name}! We're glad to have you!`,
     });
+    logger.info(`Welcome email sent to ${email}`); // Log success message
   } catch (error) {
-    console.error("error sending welcome email: " + error);
-    throw new Error("error sending welcome email");
+    logger.error("Error sending welcome email: " + error); // Log error using logger
+    throw new Error("Error sending welcome email");
   }
 };
 
@@ -49,9 +52,10 @@ const sendPasswordResetEmail = async (email, resetURL) => {
       subject: "Reset your password",
       html: `Click <a href="${resetURL}">here</a> to reset your password`,
     });
+    logger.info(`Password reset email sent to ${email}`); // Log success message
   } catch (error) {
-    console.error("error sending password reset email: " + error);
-    throw new Error("error sending password reset email");
+    logger.error("Error sending password reset email: " + error); // Log error using logger
+    throw new Error("Error sending password reset email");
   }
 };
 
@@ -64,9 +68,10 @@ const sendResetSuccessEmail = async (email) => {
       subject: "Password reset was successful",
       html: `Your password was reset successfully`,
     });
+    logger.info(`Password reset success email sent to ${email}`); // Log success message
   } catch (error) {
-    console.error("error sending reset success email: " + error);
-    throw new Error("error sending reset success email");
+    logger.error("Error sending reset success email: " + error); // Log error using logger
+    throw new Error("Error sending reset success email");
   }
 };
 

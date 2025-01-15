@@ -16,6 +16,10 @@ const {
   validateResetPasswordData,
 } = require("../utils/validations/authValidations.js");
 
+const logger = require("../utils/logger");
+
+const { CLIENT_URL, NODE_ENV } = require("../config/envConfig.js");
+
 const signup = async (req, res) => {
   try {
     const { firstname, lastname, email, password } = req.body;
@@ -52,14 +56,16 @@ const signup = async (req, res) => {
       verificationToken,
     });
 
-    await sendVerificationTokenEmail(user.email, verificationToken); // resend/email.js
+    await sendVerificationTokenEmail(user.email, verificationToken);
 
     res.status(201).json({
       success: true,
       message: "User created successfully!",
     });
+
+    logger.info(`User created: ${user.email}`); // Log the successful signup
   } catch (error) {
-    console.log("Error signing up user: " + error);
+    logger.error("Error signing up user: " + error); // Log the error during signup
     res.status(500).json({ success: false, message: "Unable to sign up user" });
   }
 };
@@ -83,14 +89,14 @@ const verifyEmail = async (req, res) => {
     user.verificationToken = undefined;
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: "14d",
     });
 
     res.cookie("token", token, {
-      httpOnly: true, // cookie cannot be accessed by client
-      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
-      sameSite: "strict", // cookie is not sent if the website is on a different domain
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
     });
 
@@ -104,8 +110,10 @@ const verifyEmail = async (req, res) => {
         role: user.role,
       },
     });
+
+    logger.info(`Email verified: ${user.email}`); // Log email verification success
   } catch (error) {
-    console.log("error verifying email: " + error);
+    logger.error("Error verifying email: " + error); // Log error during email verification
     res.status(500).json({ success: false, message: "Unable to verify user" });
   }
 };
@@ -144,14 +152,14 @@ const login = async (req, res) => {
         .json({ success: false, message: "Email not verified" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: "14d",
     });
 
     res.cookie("token", token, {
-      httpOnly: true, // cookie cannot be accessed by client
-      secure: process.env.NODE_ENV === "production", // cookie can only be sent over HTTPS
-      sameSite: "strict", // cookie is not sent if the website is on a different domain
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
     });
 
@@ -165,8 +173,10 @@ const login = async (req, res) => {
         role: user.role,
       },
     });
+
+    logger.info(`User logged in: ${user.email}`); // Log login success
   } catch (error) {
-    console.log("Error logging in: " + error);
+    logger.error("Error logging in: " + error); // Log error during login
     res.status(500).json({ success: false, message: "Unable to log in" });
   }
 };
@@ -175,13 +185,14 @@ const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: NODE_ENV === "production",
       sameSite: "strict",
     });
 
     res.status(200).json({ success: true, message: "Logout successful" });
+    logger.info("User logged out"); // Log successful logout
   } catch (error) {
-    console.error("Error during logout: ", error);
+    logger.error("Error during logout: ", error); // Log error during logout
     res.status(500).json({ success: false, message: "Logout failed" });
   }
 };
@@ -195,7 +206,7 @@ const forgotPassword = async (req, res) => {
     if (!forgotPasswordValidation.isValid)
       return res
         .status(400)
-        .json({ success: false, message: emailValidation.message });
+        .json({ success: false, message: forgotPasswordValidation.message });
 
     const user = await User.findOne({ email });
 
@@ -215,14 +226,16 @@ const forgotPassword = async (req, res) => {
 
     await sendPasswordResetEmail(
       user.email,
-      `${process.env.CLIENT_URL}/reset-password/${resetPasswordToken}`
-    ); // resend/email.js
+      `${CLIENT_URL}/reset-password/${resetPasswordToken}`
+    );
 
     res
       .status(200)
       .json({ success: true, message: "Password reset email sent" });
+
+    logger.info(`Password reset email sent: ${user.email}`); // Log reset email sent
   } catch (error) {
-    console.log("error sending password reset email: " + error);
+    logger.error("Error sending password reset email: " + error); // Log error sending reset email
     res.status(500).json({
       success: false,
       message: "Unable to complete forgot password process",
@@ -233,7 +246,7 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
-    const { password } = req.body; //new password
+    const { password } = req.body;
 
     const resetPasswordValidation = validateResetPasswordData(password);
 
@@ -268,8 +281,10 @@ const resetPassword = async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "Password reset successful" });
+
+    logger.info(`Password reset successful: ${user.email}`); // Log password reset success
   } catch (error) {
-    console.log("Error resetting password: " + error);
+    logger.error("Error resetting password: " + error); // Log error during password reset
     res
       .status(500)
       .json({ success: false, message: "Unable to update password" });
@@ -278,7 +293,6 @@ const resetPassword = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
-    // verifyTokenAndUser() middleware puts User document on req object
     const user = req.user;
 
     res.status(200).json({
@@ -291,8 +305,10 @@ const checkAuth = async (req, res) => {
       },
       message: "Checked authorization successfully",
     });
+
+    logger.info(`User authorization checked: ${user.email}`); // Log user authorization check
   } catch (error) {
-    console.log("Error checking user's auth: " + error);
+    logger.error("Error checking user's auth: " + error); // Log error checking authorization
     res.status(400).json({ success: false, message: "Unauthorized" });
   }
 };

@@ -1,9 +1,9 @@
 const morgan = require("morgan"); //testing
 
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const connectDB = require("./config/database.js");
+const { CLIENT_URL } = require("./config/envConfig.js");
 
 const express = require("express");
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 app.use(morgan("dev")); //testing
 app.use(cookieParser());
 app.use(express.json()); // parse JSON bodies
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
 
 app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/admin", require("./routes/admin.js"));

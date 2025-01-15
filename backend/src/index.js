@@ -1,6 +1,7 @@
-const app = require("./app"); // Import the app configuration
-const PORT = 4000; // Use environment variable for port, or default to 4000
+const app = require("./app"); // App configuration
+const { PORT } = require("./config/envConfig");
+const logger = require("./utils/logger");
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
+  logger.info(`Server is running on port: ${PORT}`);
 });

@@ -2,6 +2,7 @@
 
 const User = require("../models/user");
 
+const logger = require("../utils/logger");
 const verifyModeratorOrAdmin = async (req, res, next) => {
   try {
     if (req.user.role !== "moderator" && req.user.role !== "admin") {
@@ -13,6 +14,7 @@ const verifyModeratorOrAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
+    logger.error("Error in 'verifyModeratorOrAdmin middleware: " + error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

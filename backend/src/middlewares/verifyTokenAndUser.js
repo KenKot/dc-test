@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const logger = require("../utils/logger");
+const { JWT_SECRET } = require("../config/envConfig");
 
 // Middleware to verify JWT and attach user to request
 const verifyTokenAndUser = async (req, res, next) => {
@@ -13,7 +15,7 @@ const verifyTokenAndUser = async (req, res, next) => {
     }
 
     // Verify the token
-    const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedObj = jwt.verify(token, JWT_SECRET);
     const { id } = decodedObj;
 
     // Find the user in the database
@@ -28,7 +30,7 @@ const verifyTokenAndUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.error("Error in verifyToken middleware: ", err.message);
+    logger.error("Error in verifyToken middleware: ", err.message);
 
     if (err.name === "TokenExpiredError") {
       return res

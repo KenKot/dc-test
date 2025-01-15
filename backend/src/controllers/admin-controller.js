@@ -4,6 +4,7 @@ const {
   validateUpdateRoleData,
   validateUpdateRoleRestrictions,
 } = require("../utils/validations/adminValidations");
+const logger = require("../utils/logger");
 
 const updateRole = async (req, res) => {
   try {
@@ -68,8 +69,9 @@ const updateRole = async (req, res) => {
       success: true,
       message: `User's role successfully updated to ${newRole}`,
     });
+    logger.info(`User's role successfully updated to ${newRole}`); // Log the successful role update
   } catch (error) {
-    console.error("Error updating role:", error);
+    logger.error("Error updating role:", error); // Log error using logger
     res
       .status(500)
       .json({ success: false, message: "Unable to update user's role" });
@@ -77,7 +79,6 @@ const updateRole = async (req, res) => {
 };
 
 const getPendingMembers = async (req, res) => {
-  //make them verify their email?
   try {
     const pendingMembers = await User.find({
       role: "pending",
@@ -90,7 +91,7 @@ const getPendingMembers = async (req, res) => {
       pendingMembers,
     });
   } catch (error) {
-    console.error("Error getting pending members:", error);
+    logger.error("Error getting pending members:", error); // Log error using logger
     res
       .status(500)
       .json({ success: false, message: "Unable to get pending members" });
@@ -119,7 +120,7 @@ const getCurrentMembers = async (req, res) => {
       currentMembers,
     });
   } catch (error) {
-    console.error("Error getting current members", error);
+    logger.error("Error getting current members", error); // Log error using logger
     res
       .status(500)
       .json({ success: false, message: "Unable to get current members" });
@@ -138,7 +139,7 @@ const getBannedMembers = async (req, res) => {
       bannedMembers,
     });
   } catch (error) {
-    console.error("Erro getting banned members: ", error);
+    logger.error("Error getting banned members:", error); // Log error using logger
     res
       .status(500)
       .json({ success: false, message: "Unable to get banned members" });

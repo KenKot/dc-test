@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const logger = require("../utils/logger"); // Import the logger
 
 const getAllActiveMembers = async (req, res) => {
   try {
@@ -11,11 +12,13 @@ const getAllActiveMembers = async (req, res) => {
       message: "All active users returned successfully",
       activeMembers,
     });
+
+    logger.info("All active users returned successfully"); // Log success message
   } catch (error) {
-    console.log("Error getting all active users: " + error);
+    logger.error("Error getting all active users: " + error); // Log error using logger
     res
       .status(500)
-      .json({ success: false, message: "Failed retreiving users" });
+      .json({ success: false, message: "Failed retrieving users" });
   }
 };
 
@@ -36,15 +39,15 @@ const getMemberById = async (req, res) => {
       message: "Member returned successfully",
       member,
     });
+
+    logger.info(`Member returned successfully: ${member._id}`); // Log success message
   } catch (error) {
-    console.log("Error getting member by id: " + error);
-    res.status(500).json({ success: false, message: "Failed retreiving user" });
+    logger.error("Error getting member by id: " + error); // Log error using logger
+    res.status(500).json({ success: false, message: "Failed retrieving user" });
   }
 };
 
-//returns more sensitive data than "getMemberById", for only logged in user to see,
-//doesn't id in params like getMemberById
-
+// Returns more sensitive data than "getMemberById", for only logged-in user to see
 const getMemberByIdToEdit = async (req, res) => {
   try {
     // Prune this such as: password, verificationToken, etc.
@@ -62,11 +65,13 @@ const getMemberByIdToEdit = async (req, res) => {
       message: "Member returned successfully",
       member,
     });
+
+    logger.info(`Member returned successfully for edit: ${req.user._id}`); // Log success message
   } catch (error) {
-    console.log("Error getting member to edit by id: " + error);
+    logger.error("Error getting member to edit by id: " + error); // Log error using logger
     res
       .status(500)
-      .json({ success: false, message: "Failed retreiving member" });
+      .json({ success: false, message: "Failed retrieving member" });
   }
 };
 
@@ -87,11 +92,13 @@ const updateProfile = async (req, res) => {
       message: "Member returned successfully",
       member,
     });
+
+    logger.info("Profile updated successfully"); // Log success message (for progress)
   } catch (error) {
-    console.log("Error updating profile: " + error);
+    logger.error("Error updating profile: " + error); // Log error using logger
     res
       .status(500)
-      .json({ success: false, message: "Failed retreiving member" });
+      .json({ success: false, message: "Failed retrieving member" });
   }
 };
 
