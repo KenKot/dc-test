@@ -84,7 +84,7 @@ beforeEach(async () => {
   }
 });
 
-test("notes are returned as json", async () => {
+test("useres returned", async () => {
   const response = await api
     .get("/api/profiles")
     .expect(200)
