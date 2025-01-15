@@ -18,7 +18,7 @@ const {
 
 const logger = require("../utils/logger");
 
-const { CLIENT_URL, NODE_ENV } = require("../config/envConfig.js");
+const { CLIENT_URL, NODE_ENV, JWT_SECRET } = require("../config/envConfig.js");
 
 const signup = async (req, res) => {
   try {

@@ -19,7 +19,7 @@ app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/admin", require("./routes/admin.js"));
 app.use("/api", require("./routes/profile.js"));
 
-app.use(middleware.unknownEndpoint);
+// app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
 module.exports = app;

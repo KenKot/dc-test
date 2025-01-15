@@ -4,11 +4,12 @@
 const validateUpdateRoleData = (userId, userToUpdateRole, banReason) => {
   const allowedRoles = ["admin", "moderator", "member", "alumni", "banned"];
 
+  if (!userId || !userToUpdateRole)
+    return { isValid: false, message: "Include userId and role" };
+
   if (!allowedRoles.includes(userToUpdateRole)) {
     return { isValid: false, message: "Enter a valid role" };
   }
-
-  if (!userId) return { isValid: false, message: "Enter a user id" };
 
   if (banReason && banReason.length > 500) {
     return { isValid: false, message: "Limit reason to 500 characters" };

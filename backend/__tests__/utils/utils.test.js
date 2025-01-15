@@ -1,7 +1,7 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert");
 
-const generateToken = require("../src/utils/generateToken");
+const generateToken = require("../../src/utils/generateToken");
 
 describe("/utils helper functions", () => {
   describe("generateToken.js", () => {
