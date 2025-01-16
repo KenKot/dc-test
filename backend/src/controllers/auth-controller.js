@@ -85,6 +85,13 @@ const verifyEmail = async (req, res) => {
       });
     }
 
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User already verified",
+      });
+    }
+
     user.isVerified = true;
     user.verificationToken = undefined;
     await user.save();

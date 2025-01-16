@@ -19,7 +19,7 @@ export default function VerificationEmailPage() {
 
   const handleSubmit = async () => {
     await verifyEmail(value);
-    if (!error & !isLoading) {
+    if (!error && !isLoading) {
       toast({
         title: "Email is verified!",
         description: "Your email has been successfully verified",

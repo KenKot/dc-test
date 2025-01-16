@@ -12,8 +12,8 @@ const verifyTokenAndUser = require("../middlewares/verifyTokenAndUser");
 
 profileRouter.get(
   "/profiles",
-  // verifyTokenAndUser
-  // verifyGeneralMember,
+  verifyTokenAndUser,
+  verifyGeneralMember,
   getAllActiveMembers
 );
 
