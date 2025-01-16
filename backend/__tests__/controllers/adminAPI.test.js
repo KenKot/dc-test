@@ -166,6 +166,27 @@ test("Admin can unban a user and change role to member", async () => {
   assert.strictEqual(updatedUser.role, "member");
 });
 
+test("Non-admin and non-moderator users are denied access to update roles", async () => {
+  const member = await User.findOne({ role: "member" });
+  const memberToken = jwt.sign({ id: member._id }, JWT_SECRET, {
+    expiresIn: "14d",
+  });
+
+  const userToUpdate = await User.findOne({ role: "pending" });
+
+  const response = await api
+    .post("/api/admin/update-role")
+    .set("Cookie", [`token=${memberToken}`])
+    .send({
+      userIdToUpdate: userToUpdate._id,
+      newRole: "member",
+    });
+
+  assert.strictEqual(response.body.success, false);
+  assert.strictEqual(response.status, 400);
+  assert.strictEqual(response.body.message, "Improper role");
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
