@@ -27,7 +27,10 @@ const validateSignUpData = (firstname, lastname, email, password) => {
   }
 
   if (!validator.isEmail(email) && !validator.isLowerCase(email)) {
-    return { isValid: false, message: "Email is not valid" };
+    return {
+      isValid: false,
+      message: "Must be valid, lowercase email address",
+    };
   }
 
   if (!validator.isStrongPassword(password, { minLength: 8, minSymbols: 1 })) {
