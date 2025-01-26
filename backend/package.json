@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "./main/app.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
+    "start": "NODE_ENV=production node ./src/index.js",
     "dev": "NODE_ENV=development nodemon ./src/index.js",
     "test": "NODE_ENV=test node --test"
   },

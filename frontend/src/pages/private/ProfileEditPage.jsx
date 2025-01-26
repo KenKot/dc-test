@@ -19,7 +19,7 @@ const ProfileEditPage = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/profile/edit`, {
+      const response = await axios.get(`${BASE_URL}/api/profiles/edit`, {
         withCredentials: true,
       });
       console.log(response?.data);

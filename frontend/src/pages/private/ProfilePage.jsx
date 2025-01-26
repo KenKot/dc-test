@@ -13,7 +13,7 @@ const ProfilePage = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/profile/${id}`, {
+      const response = await axios.get(`${BASE_URL}/api/profiles/${id}`, {
         withCredentials: true,
       });
       console.log(response?.data);

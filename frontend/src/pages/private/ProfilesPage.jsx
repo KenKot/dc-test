@@ -26,7 +26,7 @@ const ProfilesPage = () => {
   };
 
   if (profiles.length === 0) {
-    return <div>Loading...</div>;
+    return <div>No members yet</div>;
   }
 
   return (
