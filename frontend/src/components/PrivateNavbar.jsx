@@ -15,10 +15,22 @@ const PrivateNavbar = () => {
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profiles">Member Directory</Link>
           <Link to="/profile/edit">Edit My Profile</Link>
+          <Link to="/events">Events</Link>
+          <Link to="/announcements">Announcements</Link>
         </div>
 
         {isModOrAdmin && (
-          <Button onClick={() => navigate("/admin")}>Admin Panel</Button>
+          <div className="flex gap-4">
+            <Button onClick={() => navigate("admin/permissions")}>
+              Manage Permissions
+            </Button>
+            <Button onClick={() => navigate("admin/events")}>
+              Manage Events
+            </Button>
+            <Button onClick={() => navigate("admin/announcements")}>
+              Manage Announcements
+            </Button>
+          </div>
         )}
         {<Button onClick={logout}>Logout</Button>}
       </div>

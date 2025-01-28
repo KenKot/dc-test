@@ -1,7 +1,7 @@
+import EventCalendar from "@/components/EventCalendar";
 import { useAuthStore } from "@/store/authStore";
 
 const DashboardPage = () => {
-  console.log("Dashboard.jsx");
   const { user, isCheckingAuth } = useAuthStore();
 
   console.log("DashboardPage.jsx's 'user': ,", user);
@@ -13,7 +13,8 @@ const DashboardPage = () => {
   return (
     <div>
       <h1>Dashboard</h1>
-      {/* <p>welcome, {user.name}</p> */}
+      <p>welcome, {user.firstname}</p>
+      <EventCalendar />
     </div>
   );
 };

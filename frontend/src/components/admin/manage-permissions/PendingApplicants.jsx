@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import PendingApplicantCard from "@/components/admin/PendingApplicantCard";
+import PendingApplicantCard from "@/components/admin/manage-permissions/PendingApplicantCard";
 import axios from "axios";
 import { BASE_URL } from "@/utils/constants";
 

@@ -18,9 +18,10 @@ import AccountApprovalPending from "./pages/AccountApprovalPending";
 import AccountDeactivatedPage from "./pages/AccountDeactivatedPage";
 import ProfilesPage from "./pages/private/ProfilesPage";
 import ProfilePage from "./pages/private/ProfilePage";
-import AdminDashboardPage from "./pages/private/AdminDashboardPage";
+import ManagePermissions from "./pages/private/admin/ManagePermissionsPage";
 import ProfileEditPage from "./pages/private/ProfileEditPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ManageEvents from "./pages/private/admin/ManageEventsPage";
 
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
@@ -155,10 +156,26 @@ const App = () => {
           }
         />
         <Route
-          path="/admin"
+          path="/admin/permissions"
           element={
             <ProtectAdminRoute>
-              <AdminDashboardPage />
+              <ManagePermissions />
+            </ProtectAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            <ProtectAdminRoute>
+              <ManageEvents />
+            </ProtectAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/announcements"
+          element={
+            <ProtectAdminRoute>
+              <ManagePermissions />
             </ProtectAdminRoute>
           }
         />
