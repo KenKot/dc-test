@@ -72,7 +72,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  login: async (email, password) => {
+  login: async (email, password, isRememberMe) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(
@@ -80,6 +80,7 @@ export const useAuthStore = create((set, get) => ({
         {
           email,
           password,
+          isRememberMe,
         },
         { withCredentials: true }
       );

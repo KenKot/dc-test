@@ -10,12 +10,13 @@ import { useNavigate, Link } from "react-router-dom";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isRememberMe, setIsRememberMe] = useState(false);
   const { login, isLoading, error } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    await login(email, password, isRememberMe);
     navigate("/dashboard");
   };
 
@@ -74,6 +75,16 @@ export default function LoginPage() {
                 />
               </div>
             </motion.div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={isRememberMe}
+              onChange={(e) => setIsRememberMe(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <Label htmlFor="rememberMe">Remember Me</Label>
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
