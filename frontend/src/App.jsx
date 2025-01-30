@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { Button } from "./components/ui/button";
+
 import DashboardPage from "./pages/private/DashboardPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -18,11 +19,14 @@ import AccountApprovalPending from "./pages/AccountApprovalPending";
 import AccountDeactivatedPage from "./pages/AccountDeactivatedPage";
 import ProfilesPage from "./pages/private/ProfilesPage";
 import ProfilePage from "./pages/private/ProfilePage";
-import ManagePermissions from "./pages/private/admin/ManagePermissionsPage";
 import ProfileEditPage from "./pages/private/ProfileEditPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import ManageEvents from "./pages/private/admin/ManageEventsPage";
+import EventsPage from "./pages/private/EventsPage";
 
+import ManageEvents from "./pages/private/admin/ManageEventsPage";
+import ManagePermissions from "./pages/private/admin/ManagePermissionsPage";
+
+import NotFoundPage from "./pages/NotFoundPage";
+import AnnouncementsPage from "./pages/private/Announcements";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -144,6 +148,22 @@ const App = () => {
           element={
             <ProtectRoute>
               <ProfileEditPage />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectRoute>
+              <EventsPage />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            <ProtectRoute>
+              <AnnouncementsPage />
             </ProtectRoute>
           }
         />
