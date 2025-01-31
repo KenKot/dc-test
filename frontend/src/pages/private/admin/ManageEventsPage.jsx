@@ -145,7 +145,7 @@ const ManageEvents = () => {
               onChange={(e) => setSendEmailAnnouncement(e.target.checked)}
               className="mr-2"
             />
-            Send Email Announcement
+            Send Email Announcement (disabled)
           </label>
         </div>
 

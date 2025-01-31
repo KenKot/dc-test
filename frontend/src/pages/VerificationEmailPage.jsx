@@ -30,6 +30,10 @@ export default function VerificationEmailPage() {
 
   return (
     <div className="space-y-2 flex flex-col w-full mx-auto justify-center">
+      <h1 className="text-center">
+        An email with the verification code has been sent! If you don't see it,
+        check your spam folder
+      </h1>
       <InputOTP
         maxLength={6}
         value={value}

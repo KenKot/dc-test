@@ -19,9 +19,9 @@ const EventsPage = () => {
       const response = await axios.get(`${BASE_URL}/api/events`, {
         withCredentials: true,
       });
+
       setEvents(response.data.events || []);
     } catch (error) {
-      console.error("Error fetching events:", error);
       setError("Failed to load events. Please try again later.");
     } finally {
       setLoading(false);
@@ -31,14 +31,37 @@ const EventsPage = () => {
   const handleRSVP = async (eventId) => {
     try {
       await axios.post(
-        `${BASE_URL}/api/events/${eventId}/rsvp`,
-        {},
+        `${BASE_URL}/api/events/${eventId}/rsvps`,
+        { status: "attending" },
         { withCredentials: true }
       );
+
+      fetchEvents();
       alert("You have successfully RSVP'd for this event!");
     } catch (error) {
-      console.error("Error RSVPing:", error);
       alert("Failed to RSVP. Please try again later.");
+    }
+  };
+
+  const handleUnRSVP = async (rsvpId) => {
+    if (!rsvpId) {
+      return;
+    }
+
+    try {
+      //   await axios.patch(
+      //     `${BASE_URL}/api/rsvps/${rsvpId}`,
+      //     { status: "not-attending" },
+      //     { withCredentials: true }
+      //   );
+
+      await axios.delete(`${BASE_URL}/api/rsvps/${rsvpId}`, {
+        withCredentials: true,
+      });
+      fetchEvents();
+      alert("You have successfully un-RSVP'd for this event.");
+    } catch (error) {
+      alert("Failed to un-RSVP. Please try again later.");
     }
   };
 
@@ -73,14 +96,27 @@ const EventsPage = () => {
                 {format(new Date(event.endDate), "MMMM d, yyyy h:mm a")}
               </p>
               <p>
-                <strong>Location:</strong> {event.location}
+                <strong>Your RSVP:</strong>{" "}
+                {event.userRSVPStatus === "attending"
+                  ? "attending"
+                  : "Not RSVPed"}
               </p>
-              <button
-                onClick={() => handleRSVP(event._id)}
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-              >
-                RSVP
-              </button>
+
+              {event.userRSVPStatus && event.userRSVPId ? (
+                <button
+                  onClick={() => handleUnRSVP(event.userRSVPId)}
+                  className="bg-red-500 text-white px-4 py-2 rounded mt-2 hover:bg-red-600"
+                >
+                  Un-RSVP
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleRSVP(event._id)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
+                >
+                  RSVP
+                </button>
+              )}
             </div>
           ))
         ) : (
