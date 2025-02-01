@@ -5,7 +5,6 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
 
-// ✅ Only log API requests in development mode
 if (import.meta.env.MODE === "development") {
   axios.interceptors.request.use((request) => {
     console.log(

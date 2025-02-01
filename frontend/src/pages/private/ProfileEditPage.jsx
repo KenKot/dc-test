@@ -11,7 +11,7 @@ const ProfileEditPage = () => {
   // const [firstName, setFirstName] = useState(user.firstName);
   // const [lastName, setLastName] = useState(user.lastName);
 
-  console.log("info on user store:", user);
+  // console.log("info on user store:", user);
 
   useEffect(() => {
     fetchProfile();

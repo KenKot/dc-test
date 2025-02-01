@@ -12,8 +12,6 @@ export const useAuthStore = create((set, get) => ({
   signup: async (firstname, lastname, email, password) => {
     set({ isLoading: true, error: null });
 
-    console.log(firstname, email, password);
-
     try {
       const response = await axios.post(
         BASE_URL + "/api/auth/signup",
@@ -28,17 +26,14 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
-      console.log(response?.data);
       set({
         isLoading: false,
-        // isAuthenticated: true,
-        // user: response.data.user, // this will cause 'checkAuth()' to set isAuthenticated to true
       });
     } catch (error) {
       set({ isLoading: false, error: error.response?.data?.message });
       console.log(error.response?.data?.message);
 
-      throw error; // Prevents navigate("/verify-email") if needed
+      throw error; //  Prevents navigate("/verify-email") if needed
     }
   },
 
@@ -48,27 +43,25 @@ export const useAuthStore = create((set, get) => ({
     try {
       const response = await axios.post(
         BASE_URL + "/api/auth/verify-email",
-        {
-          verificationToken,
-        },
-        {
-          withCredentials: true,
-        }
+        { verificationToken },
+        { withCredentials: true }
       );
 
-      console.log("response?.data from verifyEmail()", response?.data);
-      console.log(
-        "response?.data.user from verifyEmail()",
-        response?.data.user
-      );
+      if (!response.data.user) {
+        throw new Error("Unexpected response from server");
+      }
+
       set({
         isLoading: false,
         isAuthenticated: true,
         user: response.data.user,
       });
     } catch (error) {
-      console.log(error.response?.data?.message);
-      set({ isLoading: false, error: error.response?.data?.message });
+      const errorMessage =
+        error.response?.data?.message || "Verification failed.";
+      set({ isLoading: false, error: errorMessage });
+
+      throw new Error(errorMessage);
     }
   },
 
@@ -98,7 +91,6 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
-    console.log("A.S. logout()");
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(
@@ -117,22 +109,12 @@ export const useAuthStore = create((set, get) => ({
   },
 
   checkAuth: async () => {
-    console.log("authStore.js checkAuth fired");
-
-    // Accessing state values properly
-    const currentState = get();
-    // console.log("user: ", currentState.user || "no user");
-    // console.log("isAuthenticated: ", currentState.isAuthenticated);
-    // console.log("isCheckingAuth: ", currentState.isCheckingAuth);
-
     set({ isCheckingAuth: true, error: null });
 
     try {
       const response = await axios.get(BASE_URL + "/api/auth/check-auth", {
         withCredentials: true,
       });
-
-      console.log("checkAuth from authStore.js user: ", response.data.user);
 
       if (response.data.user) {
         set({
@@ -148,7 +130,6 @@ export const useAuthStore = create((set, get) => ({
         });
       }
     } catch (error) {
-      console.log("i'm from checkAuth's catch");
       set({ isCheckingAuth: false, isAuthenticated: false, user: null });
       console.log(error);
     }
@@ -173,7 +154,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   resetPassword: async (token, password) => {
-    console.log("A.S. resetPassword() fired");
+    // console.log("A.S. resetPassword() fired");
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(

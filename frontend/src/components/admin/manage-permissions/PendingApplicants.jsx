@@ -6,7 +6,7 @@ import { BASE_URL } from "@/utils/constants";
 
 const PendingApplicants = () => {
   const [pendingMembers, setPendingMembers] = useState([]);
-  console.log("PendingApplicants.jsx fired");
+  // console.log("PendingApplicants.jsx fired");
 
   const fetchPendingMembers = async () => {
     try {

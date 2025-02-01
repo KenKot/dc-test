@@ -1,5 +1,5 @@
 const PublicPage1 = () => {
-  console.log("PublicPage1.jsx fired");
+  // console.log("PublicPage1.jsx fired");
   return (
     <div>
       <h1>PublicPage1</h1>

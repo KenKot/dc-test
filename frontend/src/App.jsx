@@ -30,7 +30,7 @@ import AnnouncementsPage from "./pages/private/Announcements";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  console.log(isAuthenticated, user, "<-- ProtectRoute");
+  // console.log(isAuthenticated, user, "<-- ProtectRoute");
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }

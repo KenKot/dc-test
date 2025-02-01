@@ -6,7 +6,7 @@ import BannedMemberCard from "./BannedMemberCard";
 
 const BannedMembers = () => {
   const [bannedMembers, setBannedMembers] = useState([]);
-  console.log("BannedMembers.jsx fired");
+  // console.log("BannedMembers.jsx fired");
 
   const fetchBannedMembers = async () => {
     try {
