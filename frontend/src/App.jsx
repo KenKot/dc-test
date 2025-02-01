@@ -28,6 +28,7 @@ import ManageEvent from "./pages/private/admin/ManageEventPage";
 
 import NotFoundPage from "./pages/NotFoundPage";
 import AnnouncementsPage from "./pages/private/Announcements";
+import ManageAnnouncements from "./pages/private/admin/ManageAnnouncementsPage";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -204,7 +205,7 @@ const App = () => {
           path="/admin/announcements"
           element={
             <ProtectAdminRoute>
-              <ManagePermissions />
+              <ManageAnnouncements />
             </ProtectAdminRoute>
           }
         />
