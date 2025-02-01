@@ -131,45 +131,46 @@ export const useAuthStore = create((set, get) => ({
       }
     } catch (error) {
       set({ isCheckingAuth: false, isAuthenticated: false, user: null });
-      console.log(error);
+      // console.log(error);
     }
   },
 
   forgotPassword: async (email) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
+
     try {
       const response = await axios.post(
         BASE_URL + "/api/auth/forgot-password",
-        {
-          email,
-        },
+        { email },
         { withCredentials: true }
       );
 
-      console.log(response.data.message);
       set({ isLoading: false, message: response.data.message });
     } catch (error) {
-      set({ isLoading: false, error: error.response.data.message });
-      console.log(error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to send reset email.";
+      set({ isLoading: false, error: errorMessage });
+
+      throw new Error(errorMessage);
     }
   },
+
   resetPassword: async (token, password) => {
-    // console.log("A.S. resetPassword() fired");
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
+
     try {
       const response = await axios.post(
         `${BASE_URL}/api/auth/reset-password/${token}`,
-        {
-          password,
-        },
+        { password },
         { withCredentials: true }
       );
 
       set({ isLoading: false, message: response.data.message });
     } catch (error) {
-      set({ isLoading: false, error: error.response?.data?.message });
-      console.log(error);
-      throw error;
+      const errorMessage =
+        error.response?.data?.message || "Failed to reset password.";
+      set({ isLoading: false, error: errorMessage });
+      throw new Error(errorMessage);
     }
   },
 }));
