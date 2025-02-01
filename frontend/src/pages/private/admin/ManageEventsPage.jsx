@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const ManageEvents = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -23,7 +25,7 @@ const ManageEvents = () => {
   const fetchEvents = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/events`, {
-        withCredentials: true, // Include auth cookies
+        withCredentials: true,
       });
       setEvents(response.data.events);
     } catch (error) {
@@ -42,7 +44,7 @@ const ManageEvents = () => {
           startDate,
           endDate,
           location,
-          sendEmailAnnouncement, // Include checkbox value in request
+          sendEmailAnnouncement,
         },
         { withCredentials: true }
       );
@@ -52,7 +54,7 @@ const ManageEvents = () => {
       setStartDate(new Date());
       setEndDate(new Date());
       setLocation("");
-      setSendEmailAnnouncement(false); // Reset checkbox
+      setSendEmailAnnouncement(false);
       fetchEvents();
     } catch (error) {
       console.error("Error creating event:", error);
@@ -168,6 +170,12 @@ const ManageEvents = () => {
             </p>
             <p>End: {format(new Date(event.endDate), "MMMM d, yyyy h:mm a")}</p>
             <p>Location: {event.location}</p>
+            <button
+              onClick={() => navigate(`/admin/events/${event._id}`)}
+              className="bg-green-500 text-white px-2 py-1 rounded mt-2 mr-2"
+            >
+              Edit Event & View RSVPs
+            </button>
             <button
               onClick={() => handleDelete(event._id)}
               className="bg-red-500 text-white px-2 py-1 rounded mt-2"

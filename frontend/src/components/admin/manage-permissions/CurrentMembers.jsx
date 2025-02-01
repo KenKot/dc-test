@@ -6,7 +6,6 @@ import CurrentMemberCard from "./CurrentMemberCard";
 
 const CurrentMembers = () => {
   const [currentMembers, setCurrentMembers] = useState([]);
-  // console.log("CurrentMembers.jsx fired");
 
   const fetchCurrentMembers = async () => {
     try {

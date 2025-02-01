@@ -24,6 +24,7 @@ import EventsPage from "./pages/private/EventsPage";
 
 import ManageEvents from "./pages/private/admin/ManageEventsPage";
 import ManagePermissions from "./pages/private/admin/ManagePermissionsPage";
+import ManageEvent from "./pages/private/admin/ManageEventPage";
 
 import NotFoundPage from "./pages/NotFoundPage";
 import AnnouncementsPage from "./pages/private/Announcements";
@@ -188,6 +189,14 @@ const App = () => {
           element={
             <ProtectAdminRoute>
               <ManageEvents />
+            </ProtectAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/events/:eventId"
+          element={
+            <ProtectAdminRoute>
+              <ManageEvent />
             </ProtectAdminRoute>
           }
         />
