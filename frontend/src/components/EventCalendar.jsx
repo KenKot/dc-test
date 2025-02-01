@@ -7,9 +7,7 @@ import { BASE_URL } from "@/utils/constants";
 import { useAuthStore } from "@/store/authStore";
 import enUS from "date-fns/locale/en-US";
 
-const locales = {
-  "en-US": enUS,
-};
+const locales = { "en-US": enUS };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -53,54 +51,38 @@ const EventCalendar = () => {
     }
   };
 
+  const handleRSVP = async (eventId, rsvpId) => {
+    try {
+      if (!rsvpId) {
+        await axios.post(
+          `${BASE_URL}/api/events/${eventId}/rsvps`,
+          {},
+          { withCredentials: true }
+        );
+      } else {
+        await axios.patch(
+          `${BASE_URL}/api/rsvps/${rsvpId}`,
+          {},
+          { withCredentials: true }
+        );
+      }
+
+      const updatedEvents = await fetchEvents();
+      const updatedEvent = updatedEvents.find((e) => e.id === eventId);
+      if (updatedEvent) setSelectedEvent(updatedEvent);
+
+      alert("RSVP status updated!");
+    } catch (error) {
+      alert("Failed to update RSVP. Please try again later.");
+    }
+  };
+
   const handleEventClick = (event) => {
     setSelectedEvent(event);
   };
 
   const closeModal = () => {
     setSelectedEvent(null);
-  };
-
-  const handleRSVP = async (eventId) => {
-    try {
-      await axios.post(
-        `${BASE_URL}/api/events/${eventId}/rsvps`,
-        { status: "attending" },
-        { withCredentials: true }
-      );
-
-      const updatedEvents = await fetchEvents();
-
-      const updatedEvent = updatedEvents.find((e) => e.id === eventId);
-      if (updatedEvent) {
-        setSelectedEvent(updatedEvent); // Update local selected event
-      }
-
-      alert("You have successfully RSVP'd for this event!");
-    } catch (error) {
-      alert("Failed to RSVP. Please try again later.");
-    }
-  };
-
-  const handleUnRSVP = async (eventId, rsvpId) => {
-    if (!rsvpId) return;
-
-    try {
-      await axios.delete(`${BASE_URL}/api/rsvps/${rsvpId}`, {
-        withCredentials: true,
-      });
-
-      const updatedEvents = await fetchEvents();
-
-      const updatedEvent = updatedEvents.find((e) => e.id === eventId);
-      if (updatedEvent) {
-        setSelectedEvent(updatedEvent); // Update local selected event
-      }
-
-      alert("You have successfully un-RSVP'd for this event.");
-    } catch (error) {
-      alert("Failed to un-RSVP. Please try again later.");
-    }
   };
 
   if (!user) return <div>Loading...</div>;
@@ -139,23 +121,20 @@ const EventCalendar = () => {
                 ? "attending"
                 : "Not RSVPed"}
             </p>
-            {selectedEvent.userRSVPStatus === "attending" ? (
-              <button
-                onClick={() =>
-                  handleUnRSVP(selectedEvent.id, selectedEvent.userRSVPId)
-                }
-                className="bg-red-500 text-white px-4 py-2 rounded mt-4 hover:bg-red-600"
-              >
-                Un-RSVP
-              </button>
-            ) : (
-              <button
-                onClick={() => handleRSVP(selectedEvent.id)}
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600"
-              >
-                RSVP
-              </button>
-            )}
+            <button
+              onClick={() =>
+                handleRSVP(selectedEvent.id, selectedEvent.userRSVPId)
+              }
+              className={`px-4 py-2 rounded mt-4 ${
+                selectedEvent.userRSVPStatus === "attending"
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              {selectedEvent.userRSVPStatus === "attending"
+                ? "Un-RSVP"
+                : "RSVP"}
+            </button>
             <button
               onClick={closeModal}
               className="mt-4 ml-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
