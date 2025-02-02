@@ -12,13 +12,11 @@ const DashboardAnnouncements = () => {
 
   const fetchPinnedAnnouncements = async () => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/api/announcements?pinned=true`,
-        {
-          withCredentials: true,
-        }
-      );
-      setAnnouncements(response.data.announcements);
+      const response = await axios.get(`${BASE_URL}/api/announcements/pinned`, {
+        withCredentials: true,
+      });
+
+      setAnnouncements(response.data?.pinnedAnnouncements);
     } catch (error) {
       console.error("Error fetching pinned announcements:", error);
     } finally {
@@ -36,7 +34,7 @@ const DashboardAnnouncements = () => {
 
   return (
     <div className="mt-6 w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
-      {announcements.length > 0 ? (
+      {announcements?.length > 0 ? (
         <ul className="space-y-4">
           {announcements.map((announcement) => (
             <li key={announcement._id} className="border-b pb-2">

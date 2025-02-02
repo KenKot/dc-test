@@ -60,7 +60,7 @@ const ProfilePage = () => {
       {isAdmin && (
         <div className="mt-6 border-t pt-4">
           <h3 className="text-lg font-semibold text-red-600">
-            Admin-Only Info
+            Admin Viewable Only Info
           </h3>
           <p className="text-gray-600">
             <strong>Phone:</strong> {profile.phoneNumber || "Not provided"}
