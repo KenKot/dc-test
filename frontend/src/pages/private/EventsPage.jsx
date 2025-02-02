@@ -28,19 +28,22 @@ const EventsPage = () => {
     }
   };
 
-  const handleRSVP = async (eventId, rsvpId) => {
+  const handleRSVP = async (eventId, rsvpId, currentStatus) => {
     try {
-      
       if (!rsvpId) {
+        // RSVP for the first time
         await axios.post(
           `${BASE_URL}/api/events/${eventId}/rsvps`,
-          {},
+          { status: "attending" },
           { withCredentials: true }
         );
       } else {
+        // Toggle RSVP status
+        const newStatus =
+          currentStatus === "attending" ? "not attending" : "attending";
         await axios.patch(
           `${BASE_URL}/api/rsvps/${rsvpId}`,
-          {},
+          { status: newStatus },
           { withCredentials: true }
         );
       }
@@ -79,26 +82,21 @@ const EventsPage = () => {
               </p>
               <p>
                 <strong>Your RSVP:</strong>{" "}
-                {event.userRSVPStatus === "attending"
-                  ? "attending"
-                  : "Not RSVPed"}
+                {event.userRSVPStatus ? event.userRSVPStatus : "Not RSVPed"}
               </p>
 
-              {event.userRSVPStatus === "attending" && event.userRSVPId ? (
-                <button
-                  onClick={() => handleRSVP(event._id, event.userRSVPId)}
-                  className="bg-red-500 text-white px-4 py-2 rounded mt-2 hover:bg-red-600"
-                >
-                  Un-RSVP
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleRSVP(event._id, event.userRSVPId)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-                >
-                  RSVP
-                </button>
-              )}
+              <button
+                onClick={() =>
+                  handleRSVP(event._id, event.userRSVPId, event.userRSVPStatus)
+                }
+                className={`px-4 py-2 rounded mt-2 ${
+                  event.userRSVPStatus === "attending"
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-blue-500 hover:bg-blue-600"
+                } text-white`}
+              >
+                {event.userRSVPStatus === "attending" ? "Un-RSVP" : "RSVP"}
+              </button>
             </div>
           ))
         ) : (
