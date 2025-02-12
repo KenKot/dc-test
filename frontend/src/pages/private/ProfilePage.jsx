@@ -20,7 +20,7 @@ const ProfilePage = () => {
       const response = await axios.get(`${BASE_URL}/api/profiles/${id}`, {
         withCredentials: true,
       });
-      setProfile(response?.data?.profile); // Ensure `profile` matches backend response
+      setProfile(response?.data?.profile);
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -34,10 +34,18 @@ const ProfilePage = () => {
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
       {/* Profile Header */}
       <div className="flex items-center gap-4">
-        <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-2xl font-bold text-gray-700">
-          {profile.firstname?.charAt(0)}
-          {profile.lastname?.charAt(0)}
-        </div>
+        {profile.profileImage?.url ? (
+          <img
+            src={profile.profileImage.url}
+            alt={`${profile.firstname} ${profile.lastname}`}
+            className="w-20 h-20 rounded-full object-cover border border-gray-300"
+          />
+        ) : (
+          <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-2xl font-bold text-gray-700">
+            {profile.firstname?.charAt(0)}
+            {profile.lastname?.charAt(0)}
+          </div>
+        )}
         <div>
           <h1 className="text-2xl font-bold">
             {profile.firstname} {profile.lastname}

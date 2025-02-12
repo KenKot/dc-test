@@ -131,7 +131,7 @@ export const useAuthStore = create((set, get) => ({
       }
     } catch (error) {
       set({ isCheckingAuth: false, isAuthenticated: false, user: null });
-      // console.log(error);
+      console.log(error);
     }
   },
 
@@ -171,6 +171,35 @@ export const useAuthStore = create((set, get) => ({
         error.response?.data?.message || "Failed to reset password.";
       set({ isLoading: false, error: errorMessage });
       throw new Error(errorMessage);
+    }
+  },
+  uploadProfileImage: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await axios.post(
+        `${BASE_URL}/api/images/upload`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+
+      set((state) => ({
+        user: {
+          ...state.user,
+          profileImage: response.data.profileImage,
+        },
+      }));
+      return response.data.profileImage;
+    } catch (error) {
+      console.error(
+        "Profile image upload failed:",
+        error.response?.data || error.message
+      );
+      return null;
     }
   },
 }));

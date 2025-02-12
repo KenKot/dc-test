@@ -32,7 +32,25 @@ const PrivateNavbar = () => {
             </Button>
           </div>
         )}
-        {<Button onClick={logout}>Logout</Button>}
+
+        <div className="flex items-center gap-4">
+          {/* <Link to="/profile/edit"> */}
+          {user.profileImage ? (
+            <img
+              src={user.profileImage}
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full border border-gray-300 object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full text-lg font-semibold text-gray-700">
+              {user.firstname?.charAt(0)}
+              {user.lastname?.charAt(0)}
+            </div>
+          )}
+          {/* </Link> */}
+
+          <Button onClick={logout}>Logout</Button>
+        </div>
       </div>
     </nav>
   );

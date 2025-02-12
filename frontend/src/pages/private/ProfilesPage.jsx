@@ -39,10 +39,18 @@ const ProfilesPage = () => {
             className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md transition"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-lg font-semibold text-gray-700">
-                {profile.firstname.charAt(0)}
-                {profile.lastname.charAt(0)}
-              </div>
+              {profile.profileImage?.url ? (
+                <img
+                  src={profile.profileImage.url}
+                  alt={`${profile.firstname} ${profile.lastname}`}
+                  className="w-12 h-12 rounded-full object-cover border border-gray-300"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-lg font-semibold text-gray-700">
+                  {profile.firstname.charAt(0)}
+                  {profile.lastname.charAt(0)}
+                </div>
+              )}
               <div>
                 <p className="text-lg font-semibold text-blue-600">
                   {profile.firstname} {profile.lastname}

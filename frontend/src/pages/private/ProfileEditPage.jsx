@@ -1,3 +1,4 @@
+import ImageUploader from "@/components/ImageUploader";
 import { useAuthStore } from "@/store/authStore";
 import { BASE_URL } from "@/utils/constants";
 import axios from "axios";
@@ -73,6 +74,24 @@ const ProfileEditPage = () => {
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+
+      <div className="flex flex-col items-center mb-4">
+        {user?.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt="Profile"
+            className="w-24 h-24 rounded-full object-cover border border-gray-300"
+          />
+        ) : (
+          <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-2xl font-bold text-gray-700">
+            {user?.firstname?.charAt(0) || ""}
+            {user?.lastname?.charAt(0) || ""}
+          </div>
+        )}
+      </div>
+
+      {/* IMAGE UPLOADER COMPONENT*/}
+      <ImageUploader />
 
       <form onSubmit={handleUpdate} className="space-y-4">
         <div>
