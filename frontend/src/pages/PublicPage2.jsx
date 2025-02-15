@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "@/utils/constants";
 
-const LIMIT = 4;
+const LIMIT = 1;
 
 const PublicPage2 = () => {
   const [activeTab, setActiveTab] = useState("future"); // can be "future" or "past"
@@ -18,10 +18,14 @@ const PublicPage2 = () => {
   useEffect(() => {
     const type = activeTab; //initially is future, but can be "future" or "past"
     fetchEvents(type);
-  }, [activeTab]);
+  }, [activeTab, currPage]);
 
   const fetchEvents = async (type) => {
     try {
+      setIsLoading(true);
+      setError(null);
+      // console.log("fetchEvents() fired");
+
       const response = await axios.get(
         `${BASE_URL}/api/events?skip=${
           LIMIT * currPage
@@ -29,36 +33,13 @@ const PublicPage2 = () => {
         { withCredentials: true }
       );
 
-      const events = response.data.events;
       setEvents(response.data.events);
       setNumOfPages(Math.ceil(response.data.numOfEvents / LIMIT)); //for pagination
-
-      setIsLoading(false);
     } catch (error) {
       setError("Unable to retreive Events");
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const renderPageButtons = () => {
-    let buttons = [];
-
-    for (let i = 0; i < numOfPages; i++) {
-      buttons.push(
-        <button
-          key={i}
-          className={`px-4 py-2 border rounded-lg transition ${
-            currPage === i
-              ? "bg-blue-700 text-white"
-              : "bg-gray-200 hover:bg-gray-300"
-          }`}
-          onClick={() => setCurrPage(i)}
-        >
-          {i + 1}
-        </button>
-      );
-    }
-
-    return buttons;
   };
 
   if (isLoading) {
@@ -86,7 +67,10 @@ const PublicPage2 = () => {
                 ? "bg-yellow-500 text-black"
                 : "bg-gray-200 text-gray-500"
             }`}
-            onClick={() => setActiveTab("future")}
+            onClick={() => {
+              setActiveTab("future");
+              setCurrPage(0);
+            }}
           >
             Upcoming Events
           </button>
@@ -96,7 +80,10 @@ const PublicPage2 = () => {
                 ? "bg-yellow-500 text-black"
                 : "bg-gray-200 text-gray-500"
             }`}
-            onClick={() => setActiveTab("past")}
+            onClick={() => {
+              setActiveTab("past");
+              setCurrPage(0);
+            }}
           >
             Past Events
           </button>
@@ -115,11 +102,52 @@ const PublicPage2 = () => {
                 className="w-[300px] h-[200px] object-cover rounded-lg"
               />
               <h2 className="text-2xl">TITLE: {event.title}</h2>
+              <h2 className="text-2xl">ID: {event._id}</h2>
               <h2 className="text-1xl">DATE: {event.startDate}</h2>
               <h2 className="text-1xl">DESCRIPTION: {event.description}</h2>
             </div>
           ))}
           <h1>Num of Pages:{numOfPages}</h1>
+          <h1>curr page:{currPage}</h1>
+
+          {/* PAGINATION */}
+          <div className="p-10 cursor-pointer flex justify-center space-x-2">
+            {/* Previous Page Button */}
+            {currPage > 0 && (
+              <span
+                className="px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
+                // onClick={() => setCurrPage((prev) => Math.max(prev - 1, 0))}
+                onClick={() => setCurrPage((currPage) => currPage - 1)}
+              >
+                Prev
+              </span>
+            )}
+
+            {/* Page Number Buttons */}
+            {[...Array(numOfPages).keys()].map((pN) => (
+              <span
+                className={
+                  "text-xl p-4 " + (pN === currPage && "font-bold underline")
+                }
+                key={pN}
+                onClick={() => {
+                  setCurrPage(pN);
+                }}
+              >
+                {pN + 1}
+              </span>
+            ))}
+
+            {/* Next Page Button */}
+            {currPage < numOfPages - 1 && (
+              <span
+                className="px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
+                onClick={() => setCurrPage((curr) => curr + 1)}
+              >
+                Next
+              </span>
+            )}
+          </div>
         </>
       ) : (
         <h1 className="text-3xl">No Events</h1>
