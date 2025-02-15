@@ -7,6 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
+const LIMIT = 2;
+
 const ManageEvents = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -24,9 +26,13 @@ const ManageEvents = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/events`, {
-        withCredentials: true,
-      });
+      // const response = await axios.get(`${BASE_URL}/api/events`, {
+      //   withCredentials: true,
+      // });
+      const response = await axios.get(
+        `${BASE_URL}/api/events?skip=0&limit=${LIMIT}&type=future`,
+        { withCredentials: true }
+      );
       setEvents(response.data.events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -138,19 +144,6 @@ const ManageEvents = () => {
           />
         </div>
 
-        {/* New Checkbox for Send Email Announcement */}
-        <div className="mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={sendEmailAnnouncement}
-              onChange={(e) => setSendEmailAnnouncement(e.target.checked)}
-              className="mr-2"
-            />
-            Send Email Announcement (disabled)
-          </label>
-        </div>
-
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -174,7 +167,7 @@ const ManageEvents = () => {
               onClick={() => navigate(`/admin/events/${event._id}`)}
               className="bg-green-500 text-white px-2 py-1 rounded mt-2 mr-2"
             >
-              Edit Event & View RSVPs
+              Edit Event
             </button>
             <button
               onClick={() => handleDelete(event._id)}

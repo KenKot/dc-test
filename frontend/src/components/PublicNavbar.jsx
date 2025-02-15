@@ -18,7 +18,7 @@ const PublicNavbar = () => {
             to="/page2"
             className="border border-gray-400 px-3 py-1 rounded"
           >
-            Public Page 2
+            Public Events
           </Link>
         </div>
         <Link

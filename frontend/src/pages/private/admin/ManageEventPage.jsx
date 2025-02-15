@@ -17,7 +17,7 @@ const ManageEvent = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [location, setLocation] = useState("");
-  const [rsvps, setRsvps] = useState([]);
+  // const [rsvps, setRsvps] = useState([]);
 
   useEffect(() => {
     fetchEvent();
@@ -36,7 +36,7 @@ const ManageEvent = () => {
       setStartDate(data.startDate ? new Date(data.startDate) : new Date());
       setEndDate(data.endDate ? new Date(data.endDate) : new Date());
       setLocation(data.location || "");
-      setRsvps(Array.isArray(data.userRSVPs) ? data.userRSVPs : []);
+      // setRsvps(Array.isArray(data.userRSVPs) ? data.userRSVPs : []);
     } catch (error) {
       console.error("Error fetching event:", error);
     }
@@ -128,7 +128,7 @@ const ManageEvent = () => {
         <p>Loading event details...</p>
       )}
 
-      {rsvps?.length > 0 ? <RSVPList rsvps={rsvps} /> : <p>No RSVPs yet.</p>}
+      {/* {rsvps?.length > 0 ? <RSVPList rsvps={rsvps} /> : <p>No RSVPs yet.</p>} */}
     </div>
   );
 };

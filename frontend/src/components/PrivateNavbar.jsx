@@ -15,7 +15,7 @@ const PrivateNavbar = () => {
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profiles">Member Directory</Link>
           <Link to="/profile/edit">Edit My Profile</Link>
-          <Link to="/events">Events</Link>
+          {/* <Link to="/events">Events</Link> */}
           <Link to="/announcements">Announcements</Link>
         </div>
 
@@ -25,7 +25,7 @@ const PrivateNavbar = () => {
               Manage Permissions
             </Button>
             <Button onClick={() => navigate("admin/events")}>
-              Manage Events
+              Manage Public Events
             </Button>
             <Button onClick={() => navigate("admin/announcements")}>
               Manage Announcements
