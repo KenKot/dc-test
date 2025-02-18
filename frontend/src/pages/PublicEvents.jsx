@@ -1,13 +1,15 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "@/utils/constants";
+import EventCard from "@/components/EventCard";
+import ReactPaginate from "react-paginate";
 
-const LIMIT = 1;
+const LIMIT = 2;
 
-const PublicPage2 = () => {
+const PublicEvents = () => {
   const [activeTab, setActiveTab] = useState("future"); // can be "future" or "past"
 
-  //for pagination
+  // for pagination
   const [currPage, setCurrPage] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
 
@@ -16,16 +18,12 @@ const PublicPage2 = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const type = activeTab; //initially is future, but can be "future" or "past"
+    const type = activeTab; // initially is future, but can be "future" or "past"
     fetchEvents(type);
   }, [activeTab, currPage]);
 
   const fetchEvents = async (type) => {
     try {
-      setIsLoading(true);
-      setError(null);
-      // console.log("fetchEvents() fired");
-
       const response = await axios.get(
         `${BASE_URL}/api/events?skip=${
           LIMIT * currPage
@@ -34,12 +32,17 @@ const PublicPage2 = () => {
       );
 
       setEvents(response.data.events);
-      setNumOfPages(Math.ceil(response.data.numOfEvents / LIMIT)); //for pagination
+      setNumOfPages(Math.ceil(response.data.numOfEvents / LIMIT)); // for pagination
     } catch (error) {
-      setError("Unable to retreive Events");
+      setError("Unable to retrieve Events");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageChange = ({ selected }) => {
+    setCurrPage(selected);
+    window.scrollTo(0, 0); // Scroll to top when page changes
   };
 
   if (isLoading) {
@@ -57,6 +60,7 @@ const PublicPage2 = () => {
       </div>
     );
   }
+
   return (
     <div>
       <div>
@@ -95,59 +99,32 @@ const PublicPage2 = () => {
         <>
           <h1 className="text-3xl">Events</h1>
           {events.map((event) => (
-            <div className="border-2 border-black my-4" key={event._id}>
-              <img
-                src="/public-event-default.jpeg"
-                alt={event.title}
-                className="w-[300px] h-[200px] object-cover rounded-lg"
-              />
-              <h2 className="text-2xl">TITLE: {event.title}</h2>
-              <h2 className="text-2xl">ID: {event._id}</h2>
-              <h2 className="text-1xl">DATE: {event.startDate}</h2>
-              <h2 className="text-1xl">DESCRIPTION: {event.description}</h2>
-            </div>
+            <EventCard
+              key={event._id}
+              id={event._id}
+              event={event}
+              isLarge={true}
+              className="my-4"
+            />
           ))}
-          <h1>Num of Pages:{numOfPages}</h1>
-          <h1>curr page:{currPage}</h1>
+          <h1>Num of Pages: {numOfPages}</h1>
+          <h1>Curr Page: {currPage}</h1>
 
           {/* PAGINATION */}
-          <div className="p-10 cursor-pointer flex justify-center space-x-2">
-            {/* Previous Page Button */}
-            {currPage > 0 && (
-              <span
-                className="px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
-                // onClick={() => setCurrPage((prev) => Math.max(prev - 1, 0))}
-                onClick={() => setCurrPage((currPage) => currPage - 1)}
-              >
-                Prev
-              </span>
-            )}
-
-            {/* Page Number Buttons */}
-            {[...Array(numOfPages).keys()].map((pN) => (
-              <span
-                className={
-                  "text-xl p-4 " + (pN === currPage && "font-bold underline")
-                }
-                key={pN}
-                onClick={() => {
-                  setCurrPage(pN);
-                }}
-              >
-                {pN + 1}
-              </span>
-            ))}
-
-            {/* Next Page Button */}
-            {currPage < numOfPages - 1 && (
-              <span
-                className="px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
-                onClick={() => setCurrPage((curr) => curr + 1)}
-              >
-                Next
-              </span>
-            )}
-          </div>
+          <ReactPaginate
+            previousLabel="Previous"
+            nextLabel="Next"
+            pageCount={numOfPages}
+            onPageChange={handlePageChange}
+            forcePage={currPage}
+            containerClassName="flex items-center justify-center gap-2 my-8"
+            pageClassName="px-3 py-1 rounded border hover:bg-gray-100"
+            previousClassName="px-3 py-1 rounded border hover:bg-gray-100"
+            nextClassName="px-3 py-1 rounded border hover:bg-gray-100"
+            activeClassName="bg-yellow-500 text-black border-yellow-500"
+            disabledClassName="opacity-50 cursor-not-allowed"
+            renderOnZeroPageCount={null}
+          />
         </>
       ) : (
         <h1 className="text-3xl">No Events</h1>
@@ -156,4 +133,4 @@ const PublicPage2 = () => {
   );
 };
 
-export default PublicPage2;
+export default PublicEvents;

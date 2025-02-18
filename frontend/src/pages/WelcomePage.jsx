@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "@/utils/constants";
 import { Link } from "react-router-dom";
+import EventCard from "@/components/EventCard";
 
 const LIMIT = 4;
 
@@ -44,30 +45,34 @@ const WelcomePage = () => {
     );
   }
   return (
-    <div>
+    <div className="max-w-5xl mx-auto px-4">
+      <h1 className="text-4xl font-bold text-red-600 mb-2">Events</h1>
+      <p className="text-lg text-gray-600 mb-6">Check out new events</p>
+
       {events.length > 0 ? (
         <>
-          <h1 className="text-3xl">Events</h1>
-          {events.map((event) => (
-            <div className="border-2 border-black my-4" key={event._id}>
-              <img
-                src="/public-event-default.jpeg"
-                alt={event.title}
-                className="w-[300px] h-[200px] object-cover rounded-lg"
-              />
-              <h2 className="text-2xl">TITLE: {event.title}</h2>
-              <h2 className="text-1xl">DATE: {event.startDate}</h2>
-              <h2 className="text-1xl">DESCRIPTION: {event.description}</h2>
-            </div>
-          ))}
-          <Link to="/page2">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-              View All
-            </button>
-          </Link>
+          {/* Featured Event */}
+          <EventCard event={events[0]} isLarge={true} />
+
+          {/* Other Events List */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            {events.slice(1, 4).map((event) => (
+              <>
+                <EventCard key={event._id} event={event} />
+              </>
+            ))}
+          </div>
+
+          <div className="text-center mt-6">
+            <Link to="/public-events">
+              <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-600 hover:text-white transition">
+                View More
+              </button>
+            </Link>
+          </div>
         </>
       ) : (
-        <h1 className="text-3xl">No Events</h1>
+        <h1 className="text-3xl text-center">No Events</h1>
       )}
     </div>
   );

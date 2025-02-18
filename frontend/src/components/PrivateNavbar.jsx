@@ -12,6 +12,9 @@ const PrivateNavbar = () => {
     <nav className="p-4 bg-slate-100">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex gap-4">
+          <Link to="/" className="border border-red-500">
+            Landing Page
+          </Link>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profiles">Member Directory</Link>
           <Link to="/profile/edit">Edit My Profile</Link>

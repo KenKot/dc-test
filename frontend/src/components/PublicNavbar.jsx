@@ -15,7 +15,7 @@ const PublicNavbar = () => {
             Contact Form Tester/Public Page 1
           </Link>
           <Link
-            to="/page2"
+            to="/public-events"
             className="border border-gray-400 px-3 py-1 rounded"
           >
             Public Events

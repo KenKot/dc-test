@@ -12,7 +12,6 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PublicLayout from "./layouts/PublicLayout";
 import PublicPage1 from "./pages/PublicPage1";
-import PublicPage2 from "./pages/PublicPage2";
 import AuthLayout from "./layouts/AuthLayout";
 import WelcomePage from "./pages/WelcomePage";
 import AccountApprovalPending from "./pages/AccountApprovalPending";
@@ -29,6 +28,7 @@ import ManageEvent from "./pages/private/admin/ManageEventPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AnnouncementsPage from "./pages/private/Announcements";
 import ManageAnnouncements from "./pages/private/admin/ManageAnnouncementsPage";
+import PublicEvents from "./pages/PublicEvents";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -93,7 +93,7 @@ const App = () => {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/page1" element={<PublicPage1 />} />
-        <Route path="/page2" element={<PublicPage2 />} />
+        <Route path="/public-events" element={<PublicEvents />} />
         <Route path="/account-pending" element={<AccountApprovalPending />} />
         <Route
           path="/account-deactivated"
