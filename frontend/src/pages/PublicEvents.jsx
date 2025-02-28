@@ -4,7 +4,7 @@ import { BASE_URL } from "@/utils/constants";
 import EventCard from "@/components/EventCard";
 import ReactPaginate from "react-paginate";
 
-const LIMIT = 2;
+const LIMIT = 4;
 
 const PublicEvents = () => {
   const [activeTab, setActiveTab] = useState("future"); // can be "future" or "past"
@@ -107,8 +107,6 @@ const PublicEvents = () => {
               className="my-4"
             />
           ))}
-          <h1>Num of Pages: {numOfPages}</h1>
-          <h1>Curr Page: {currPage}</h1>
 
           {/* PAGINATION */}
           <ReactPaginate

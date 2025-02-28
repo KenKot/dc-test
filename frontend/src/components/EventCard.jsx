@@ -6,7 +6,7 @@ const EventCard = ({ event, isLarge = false }) => {
       }`}
     >
       <img
-        src={event.thumbnail || "/public-event-default.jpeg"}
+        src={event.image?.url || "/public-event-default.jpeg"}
         alt={event.title}
         className={`rounded-lg object-cover ${
           isLarge ? "w-full md:w-1/2 h-[250px]" : "w-24 h-24"

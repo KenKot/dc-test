@@ -62,7 +62,7 @@ const ManageEvent = () => {
           startDate,
           endDate,
           location,
-          image: eventImageId,
+          eventImageId,
         },
         { withCredentials: true }
       );

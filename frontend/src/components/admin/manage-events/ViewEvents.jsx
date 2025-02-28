@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 3;
 const DEFAULT_IMAGE = "/public-event-default.jpeg";
 
 const ViewEvents = () => {
