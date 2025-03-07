@@ -7,40 +7,46 @@ import PendingApplicantCard from "@/components/admin/manage-permissions/PendingA
 import BannedMembers from "@/components/admin/manage-permissions/BannedMembers";
 import CurrentMembers from "@/components/admin/manage-permissions/CurrentMembers";
 import PendingApplicants from "@/components/admin/manage-permissions/PendingApplicants";
+import MemberStats from "@/components/admin/MemberStats"; // Import MemberStats
 
 const ManagePermissions = () => {
   return (
-    <Tabs defaultValue="pending" className="w-full mt-4">
-      <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto">
-        <TabsTrigger
-          value="pending"
-          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
-        >
-          Approve/Reject Pending Applicants
-        </TabsTrigger>
-        <TabsTrigger
-          value="current"
-          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
-        >
-          Update Current Members
-        </TabsTrigger>
-        <TabsTrigger
-          value="banned"
-          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
-        >
-          Update Banned/Rejected Members
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="pending">
-        <PendingApplicants />
-      </TabsContent>
-      <TabsContent value="current">
-        <CurrentMembers />
-      </TabsContent>
-      <TabsContent value="banned">
-        <BannedMembers />
-      </TabsContent>
-    </Tabs>
+    <div className="w-full mt-4">
+      {/* Member Stats Section */}
+      <MemberStats />
+
+      <Tabs defaultValue="pending" className="w-full mt-4">
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto">
+          <TabsTrigger
+            value="pending"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
+          >
+            Approve/Reject Pending Applicants
+          </TabsTrigger>
+          <TabsTrigger
+            value="current"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
+          >
+            Update Current Members
+          </TabsTrigger>
+          <TabsTrigger
+            value="banned"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-2"
+          >
+            Update Banned/Rejected Members
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="pending">
+          <PendingApplicants />
+        </TabsContent>
+        <TabsContent value="current">
+          <CurrentMembers />
+        </TabsContent>
+        <TabsContent value="banned">
+          <BannedMembers />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
