@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { useAuthStore } from "../store/authStore";
+import UserSearchbar from "../components/UserSearchbar";
 
 const PrivateNavbar = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-
   const isModOrAdmin = user.role === "admin" || user.role === "moderator";
 
   return (
@@ -18,10 +18,8 @@ const PrivateNavbar = () => {
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profiles">Member Directory</Link>
           <Link to="/profile/edit">Edit My Profile</Link>
-          {/* <Link to="/events">Events</Link> */}
           <Link to="/announcements">Announcements</Link>
         </div>
-
         {isModOrAdmin && (
           <div className="flex gap-4">
             <Button onClick={() => navigate("admin/permissions")}>
@@ -35,9 +33,8 @@ const PrivateNavbar = () => {
             </Button>
           </div>
         )}
-
+        <UserSearchbar />
         <div className="flex items-center gap-4">
-          {/* <Link to="/profile/edit"> */}
           {user.profileImage ? (
             <img
               src={user.profileImage}
@@ -50,8 +47,6 @@ const PrivateNavbar = () => {
               {user.lastname?.charAt(0)}
             </div>
           )}
-          {/* </Link> */}
-
           <Button onClick={logout}>Logout</Button>
         </div>
       </div>
