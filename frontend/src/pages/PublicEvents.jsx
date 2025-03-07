@@ -104,6 +104,7 @@ const PublicEvents = () => {
               id={event._id}
               event={event}
               isLarge={true}
+              maxDescLength={600}
               className="my-4"
             />
           ))}

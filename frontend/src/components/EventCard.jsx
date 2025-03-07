@@ -1,4 +1,14 @@
-const EventCard = ({ event, isLarge = false }) => {
+import React from "react";
+
+const EventCard = ({ event, isLarge = false, maxDescLength }) => {
+  const defaultLength = isLarge ? 200 : 80;
+  const maxLength = maxDescLength || defaultLength;
+
+  const truncatedDescription =
+    event.description && event.description.length > maxLength
+      ? event.description.slice(0, maxLength) + "..."
+      : event.description;
+
   return (
     <div
       className={`flex ${
@@ -21,12 +31,8 @@ const EventCard = ({ event, isLarge = false }) => {
           {event.title}
         </h2>
         <p className="text-gray-500 text-sm mb-2">{event.startDate}</p>
-        <p
-          className={`${
-            isLarge ? "text-gray-700" : "text-gray-700 text-sm truncate"
-          }`}
-        >
-          {event.description}
+        <p className={`${isLarge ? "text-gray-700" : "text-sm text-gray-700"}`}>
+          {truncatedDescription}
         </p>
       </div>
     </div>

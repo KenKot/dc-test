@@ -57,8 +57,6 @@ const ViewEvents = () => {
     }
   };
 
-  //   if (!user) return <div>Loading...</div>;
-
   return (
     <div className="container mx-auto p-4">
       {/* Sub-tabs for Future/Past Events */}
