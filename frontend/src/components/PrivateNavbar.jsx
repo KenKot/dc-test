@@ -31,6 +31,9 @@ const PrivateNavbar = () => {
             <Button onClick={() => navigate("admin/announcements")}>
               Manage Announcements
             </Button>
+            <Button onClick={() => navigate("admin/texter")}>
+              Group Texter
+            </Button>
           </div>
         )}
         <UserSearchbar />
