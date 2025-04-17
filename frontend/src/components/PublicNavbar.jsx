@@ -9,6 +9,12 @@ const PublicNavbar = () => {
             Home
           </Link>
           <Link
+            to="/application-form-tester"
+            className="border-gray-400 border px-3 py-1 rounded"
+          >
+            Application Form Tester
+          </Link>
+          <Link
             to="/page1"
             className="border border-gray-400 px-3 py-1 rounded"
           >

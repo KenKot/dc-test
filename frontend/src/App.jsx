@@ -30,6 +30,7 @@ import AnnouncementsPage from "./pages/private/Announcements";
 import ManageAnnouncements from "./pages/private/admin/ManageAnnouncementsPage";
 import PublicEvents from "./pages/PublicEvents";
 import Texter from "./components/admin/Texter";
+import ApplicationFormPage from "./pages/ApplicationFormPage";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -94,6 +95,10 @@ const App = () => {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/page1" element={<PublicPage1 />} />
+        <Route
+          path="/application-form-tester"
+          element={<ApplicationFormPage />}
+        />
         <Route path="/public-events" element={<PublicEvents />} />
         <Route path="/account-pending" element={<AccountApprovalPending />} />
         <Route
