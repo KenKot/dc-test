@@ -29,8 +29,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import AnnouncementsPage from "./pages/private/Announcements";
 import ManageAnnouncements from "./pages/private/admin/ManageAnnouncementsPage";
 import PublicEvents from "./pages/PublicEvents";
-import Texter from "./components/admin/Texter";
+// import Texter from "./components/admin/Texter";
 import ApplicationFormPage from "./pages/ApplicationFormPage";
+import Emailer from "./components/admin/Emailer";
 //Not logged in? You can't go to the protected routes
 const ProtectRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -216,10 +217,10 @@ const App = () => {
           }
         />
         <Route
-          path="/admin/texter"
+          path="/admin/emailer"
           element={
             <ProtectAdminRoute>
-              <Texter />
+              <Emailer />
             </ProtectAdminRoute>
           }
         />
